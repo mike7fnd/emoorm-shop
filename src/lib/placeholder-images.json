@@ -1,0 +1,136 @@
+{
+  "placeholderImages": [
+    {
+      "id": "1",
+      "description": "A basket of fresh calamansi",
+      "imageUrl": "https://images.unsplash.com/photo-1565507853153-26f5d6e71caa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYWxhbWFuc2klMjBmcnVpdHxlbnwwfHx8fDE3NjczMzI0MTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "calamansi fruit"
+    },
+    {
+      "id": "2",
+      "description": "A pile of red rambutan",
+      "imageUrl": "https://images.unsplash.com/photo-1635830092719-0e3b5aedc364?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxyYW1idXRhbiUyMGZydWl0fGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "rambutan fruit"
+    },
+    {
+      "id": "3",
+      "description": "A jar of golden wild honey",
+      "imageUrl": "https://images.unsplash.com/photo-1633434644309-cc8d4f0c207d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxqYXIlMjBob25leXxlbnwwfHx8fDE3NjcyNDU1OTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "jar honey"
+    },
+    {
+      "id": "4",
+      "description": "A handwoven nito vine basket",
+      "imageUrl": "https://images.unsplash.com/photo-1685257814865-447d119a29fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx3b3ZlbiUyMGJhc2tldHxlbnwwfHx8fDE3NjczMzI0MTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woven basket"
+    },
+    {
+      "id": "5",
+      "description": "Dried fish (tuyo) on a plate",
+      "imageUrl": "https://images.unsplash.com/photo-1572420963886-7850f1af053e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkcmllZCUyMGZpc2h8ZW58MHx8fHwxNzY3MzMyNDE0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dried fish"
+    },
+    {
+      "id": "6",
+      "description": "A bowl of crispy banana chips",
+      "imageUrl": "https://images.unsplash.com/photo-1608781822675-88af808643ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxiYW5hbmElMjBjaGlwc3xlbnwwfHx8fDE3NjczMzI0MTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "banana chips"
+    },
+    {
+      "id": "7",
+      "description": "Roasted cashew nuts in a bowl",
+      "imageUrl": "https://images.unsplash.com/photo-1615485925873-7ecbbe90a866?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYXNoZXclMjBudXRzfGVufDB8fHx8MTc2NzMwODYyMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cashew nuts"
+    },
+    {
+      "id": "8",
+      "description": "Filipino tablea cacao balls",
+      "imageUrl": "https://images.unsplash.com/photo-1647532197692-ad9f2ecae422?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYWNhbyUyMGJhbGxzfGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cacao balls"
+    },
+    {
+      "id": "9",
+      "description": "A handwoven buri palm bag",
+      "imageUrl": "https://images.unsplash.com/photo-1765115070689-43485654f37b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx3b3ZlbiUyMGJhZ3xlbnwwfHx8fDE3NjczMzI0MTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woven bag"
+    },
+    {
+      "id": "10",
+      "description": "Fresh yellow mangoes",
+      "imageUrl": "https://images.unsplash.com/photo-1622887500009-5989d4309bdf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx5ZWxsb3clMjBtYW5nb2VzfGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "yellow mangoes"
+    },
+    {
+      "id": "11",
+      "description": "A bottle of coconut vinegar",
+      "imageUrl": "https://images.unsplash.com/photo-1643171785612-163ed13cf1b4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb2NvbnV0JTIwdmluZWdhcnxlbnwwfHx8fDE3NjczMzI0MTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coconut vinegar"
+    },
+    {
+      "id": "12",
+      "description": "A bunch of lanzones fruit",
+      "imageUrl": "https://images.unsplash.com/photo-1560287820-f71eda3d75c9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxsYW56b25lcyUyMGZydWl0fGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "lanzones fruit"
+    },
+    {
+      "id": "13",
+      "description": "Suman sa Lihia wrapped in banana leaves",
+      "imageUrl": "https://images.unsplash.com/photo-1705147289789-6df2593f1b1e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzdW1hbiUyMHJpY2V8ZW58MHx8fHwxNzY3MzMyNDE0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "suman rice"
+    },
+    {
+      "id": "14",
+      "description": "Freshly roasted Barako coffee beans",
+      "imageUrl": "https://images.unsplash.com/photo-1599399225729-1a7f05b5837b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb2ZmZWUlMjBiZWFuc3xlbnwwfHx8fDE3NjczMzI0MTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coffee beans"
+    },
+    {
+      "id": "15",
+      "description": "A jar of vibrant purple ube jam",
+      "imageUrl": "https://images.unsplash.com/photo-1629813876869-d6a367464d14?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwdXJwbGUlMjBqYW18ZW58MHx8fHwxNzY3MzMyNDE0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "purple jam"
+    },
+    {
+      "id": "16",
+      "description": "Sweet and sour tamarind candy balls",
+      "imageUrl": "https://images.unsplash.com/photo-1599231577696-9d3326f595f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0YW1hcmluZCUyMGNhbmR5fGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tamarind candy"
+    },
+    {
+      "id": "17",
+      "description": "A hand-painted woven bayong bag",
+      "imageUrl": "https://images.unsplash.com/photo-1621990838936-39907a41a4a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmaWxpcGlubyUyMHdvemVuJTIwYmFnfGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woven bag"
+    },
+    {
+      "id": "store-1",
+      "description": "A bustling local market in the Philippines",
+      "imageUrl": "https://images.unsplash.com/photo-1631692994621-d26f83cf4db8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsb2NhbCUyMG1hcmtldHxlbnwwfHx8fDE3NjcyNjQzMzZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "local market"
+    },
+    {
+      "id": "store-2",
+      "description": "A small shop on a tropical beach",
+      "imageUrl": "https://images.unsplash.com/photo-1642011176835-1787442924fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxiZWFjaCUyMHNob3B8ZW58MHx8fHwxNzY3Mjg3MDYxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beach shop"
+    },
+    {
+      "id": "store-3",
+      "description": "A roadside fruit stand with fresh produce",
+      "imageUrl": "https://images.unsplash.com/photo-1564941547258-273e19e5d4bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxmcnVpdCUyMHN0YW5kfGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fruit stand"
+    },
+    {
+      "id": "store-4",
+      "description": "A small hut selling native handicrafts",
+      "imageUrl": "https://images.unsplash.com/photo-1760647832573-969bf71d12b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjcmFmdHMlMjBzdGFsbHxlbnwwfHx8fDE3NjczMzI0MTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "crafts stall"
+    },
+    {
+      "id": "hero-1",
+      "description": "A beautiful view of a rice paddy field in Mindoro",
+      "imageUrl": "https://images.unsplash.com/photo-1546845776-dcdf70fd09e3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxyaWNlJTIwZmllbGRzfGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "rice fields"
+    }
+  ]
+}
