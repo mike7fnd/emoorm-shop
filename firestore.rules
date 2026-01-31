@@ -1,0 +1,128 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * SECURITY RULES DOCUMENTATION
+     *
+     * Core Philosophy: 
+     * This ruleset implements a strict user-ownership model for personal data and a public catalog 
+     * model for business-related entities. It is optimized for rapid prototyping by focusing 
+     * on authorization (who can access what) rather than strict data schema validation.
+     *
+     * Data Structure:
+     * - User-specific data is stored under /users/{userId}.
+     * - Business and catalog data (Products, Categories) are top-level collections for global access.
+     * - Seller profiles are top-level but linked to users via a denormalized 'userId' field.
+     *
+     * Key Security Decisions:
+     * - User Profiles: Locked down to the specific owner. Listing users is disabled for privacy.
+     * - Wishlists: Nested under the user path to enforce automatic filtering and ownership.
+     * - Sellers/Catalog: Read access is public to allow customers to browse. 
+     * - Write Access: Secured via ownership checks (SellerProfile) or restricted to prevent 
+     *   unauthorized modification (Products/Categories).
+     *
+     * Denormalization for Authorization:
+     * - SellerProfile documents include a 'userId' field to allow the owner to manage their 
+     *   shop without performing expensive cross-collection lookups.
+     */
+
+    // --- Helper Functions ---
+
+    /** Checks if the request is from an authenticated user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** Checks if the authenticated user matches the provided ID. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** Checks if the authenticated user owns the document based on an internal field. */
+    function isDataOwner(data) {
+      return isSignedIn() && data.userId == request.auth.uid;
+    }
+
+    /** Combines existence check and ownership check for updates/deletes. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** Validates that a field is not being changed during an update. */
+    function isUnchanged(key) {
+      return request.resource.data[key] == resource.data[key];
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for the UserProfile collection.
+     * @path /users/{userId}
+     * @allow Authenticated user can create/get/update their own profile. (get)
+     * @deny Any user attempting to list all profiles or read/write another user's profile.
+     * @principle Path-based ownership and relational integrity (id matches path).
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Privacy: Do not allow user discovery.
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && isUnchanged('id');
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Rules for a user's Wishlist items.
+       * @path /users/{userId}/wishlistItems/{itemId}
+       * @allow Owner of the parent user document can manage their wishlist. (create)
+       * @deny Users accessing items in someone else's wishlist path.
+       * @principle Nested path ownership.
+       */
+      match /wishlistItems/{itemId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && isUnchanged('userId');
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    /**
+     * @description Rules for Seller Profiles.
+     * @path /sellers/{sellerId}
+     * @allow Public read access for customers; owner-only writes. (list)
+     * @deny Unauthenticated users or non-owners attempting to edit shop details.
+     * @principle Field-based ownership (userId field) with public read access.
+     */
+    match /sellers/{sellerId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && isDataOwner(request.resource.data);
+      allow update: if resource != null && isDataOwner(resource.data) && isUnchanged('userId');
+      allow delete: if resource != null && isDataOwner(resource.data);
+    }
+
+    /**
+     * @description Rules for the Product catalog.
+     * @path /products/{productId}
+     * @allow Everyone can browse products. (get)
+     * @deny Any write operation.
+     * @principle CRITICAL: Cannot implement owner-only writes. The 'Product' entity is missing an 'ownerId' or 'sellerId' field.
+     */
+    match /products/{productId} {
+      allow get, list: if true;
+      // TODO: Add owner validation once the schema is updated with an ownership field (e.g., sellerId).
+      allow create, update, delete: if false; 
+    }
+
+    /**
+     * @description Rules for Product Categories.
+     * @path /categories/{categoryId}
+     * @allow Everyone can read categories. (list)
+     * @deny Any write operation.
+     * @principle Public consumption with administrative control (currently denied for safety).
+     */
+    match /categories/{categoryId} {
+      allow get, list: if true;
+      // TODO: Implement Admin-only writes using a custom claim or roles collection.
+      allow create, update, delete: if false;
+    }
+  }
+}

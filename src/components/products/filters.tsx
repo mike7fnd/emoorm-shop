@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -43,7 +44,7 @@ export function Filters({
 
   return (
     <>
-      <div className="flex justify-between items-center p-4 pt-0 shadow-sm">
+      <div className="flex justify-between items-center p-4 py-2 shadow-sm">
          <h2 className="text-lg font-semibold">Filters</h2>
          <Button variant="ghost" size="sm" onClick={onClear}>
           Clear All

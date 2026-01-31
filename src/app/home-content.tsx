@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef, useLayoutEffect } from 'react';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/header';
@@ -12,8 +11,33 @@ import { StoreCard } from '@/components/stores/store-card';
 import { ProductGrid } from '@/components/products/product-grid';
 import { HeroSection } from '@/components/home/hero-section';
 import { cn } from '@/lib/utils';
+import { gsap } from 'gsap';
+import { 
+  Leaf, 
+  UtensilsCrossed, 
+  Palette, 
+  Package, 
+  Sparkles, 
+  Home, 
+  CupSoda, 
+  Shirt,
+  LayoutGrid
+} from 'lucide-react';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { MoormyBot } from '@/components/chat/moormy-bot';
 
 const MAX_PRICE = 15000;
+
+const categoryIcons: Record<string, any> = {
+  'Fresh Produce': Leaf,
+  'Local Delicacies': UtensilsCrossed,
+  'Handicrafts': Palette,
+  'Pantry Staples': Package,
+  'Wellness & Herbs': Sparkles,
+  'Home Decor': Home,
+  'Beverages': CupSoda,
+  'Native Fashion': Shirt,
+};
 
 export function HomeContent() {
   const router = useRouter();
@@ -26,17 +50,52 @@ export function HomeContent() {
   const [priceRange, setPriceRange] = useState<[number]>([MAX_PRICE]);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [isClient, setIsClient] = useState(false);
+  const [isShrunk, setIsShrunk] = useState(false);
+  const tabContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsClient(true);
+    
+    const handleScroll = () => {
+      if (window.scrollY > 40) {
+        setIsShrunk(true);
+      } else {
+        setIsShrunk(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useLayoutEffect(() => {
+    if (!tabContainerRef.current) return;
+
+    const activeTrigger = tabContainerRef.current.querySelector(`[data-value="${activeTab}"]`);
+    const activeIcon = activeTrigger?.querySelector('img');
+    
+    // Animate all icons to default state first
+    gsap.to(tabContainerRef.current.querySelectorAll('img'), {
+      filter: 'brightness(1)',
+      scale: 1,
+      duration: 0.3,
+      ease: 'power2.out'
+    });
+
+    if (activeIcon) {
+        gsap.to(activeIcon, { 
+            duration: 0.4, 
+            scale: 1, 
+            filter: 'brightness(1.25)', 
+            ease: "power2.out",
+        });
+    }
+
+  }, [activeTab]);
+
   useEffect(() => {
-    // When the component mounts, update the URL if there's an initial search query
-    // This is to keep the URL clean if the user navigates away and back.
     if (initialSearch) {
       const newUrl = `/?search=${encodeURIComponent(initialSearch)}`;
-      // We use replaceState to not add a new entry to the browser history
       window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
     }
   }, [initialSearch]);
@@ -57,7 +116,7 @@ export function HomeContent() {
       return categoryMatch && brandMatch && priceMatch && searchMatch;
     });
   }, [selectedCategories, selectedBrands, priceRange, searchQuery]);
-
+  
   const dealProducts = useMemo(() => products.slice(0, 4), []);
 
   const handleClearFilters = () => {
@@ -73,6 +132,14 @@ export function HomeContent() {
       const newUrl = query ? `/?search=${encodeURIComponent(query)}` : '/';
       router.replace(newUrl, { scroll: false });
   }
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category) 
+        : [...prev, category]
+    );
+  };
 
   const filterState = {
     brands,
@@ -95,63 +162,115 @@ export function HomeContent() {
       <Header {...filterState} searchPlaceholder={searchPlaceholder} />
       <main className="flex-1">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex justify-center shadow-sm">
-            <TabsList value={activeTab} className="rounded-none bg-transparent p-0 h-auto gap-8">
+          <div className="flex justify-center shadow-sm md:sticky md:top-16 bg-background z-30 relative">
+            <TabsList ref={tabContainerRef} value={activeTab} className="rounded-none bg-transparent p-0 h-auto gap-8">
               <TabsTrigger
                 value="shop"
-                className="group flex flex-col gap-1 rounded-none border-b-2 border-transparent data-[state=active]:text-foreground -mb-px pt-3 px-3 pb-2 bg-transparent"
+                className="group flex flex-col gap-1 rounded-none border-b-2 border-transparent data-[state=active]:text-foreground -mb-px pt-3 px-3 pb-2 bg-transparent transition-all duration-300"
               >
-                <div
-                  className="relative h-10 w-10"
-                >
+                <div className={cn(
+                  "relative transition-all duration-300 ease-in-out h-10 w-10 overflow-hidden",
+                  isShrunk ? "md:h-0 md:opacity-0 md:scale-95" : "md:h-10 md:opacity-100 md:scale-100"
+                )}>
                    <Image
                     src="https://image2url.com/r2/default/images/1767355724970-94a23b61-9566-4738-b2a1-e0e1a7997053.png"
                     alt="Shop Icon"
                     width={40}
                     height={40}
-                    className="object-contain group-data-[state=active]:brightness-110 group-data-[state=active]:scale-125 transition-all"
+                    className="object-contain transition-all"
                   />
                 </div>
-                <span className="text-xs">Shop</span>
+                <span className="text-xs transition-transform duration-300">Shop</span>
               </TabsTrigger>
               <TabsTrigger
                 value="stores"
-                className="group flex flex-col gap-1 rounded-none border-b-2 border-transparent data-[state=active]:text-foreground -mb-px pt-3 px-3 pb-2 bg-transparent"
+                className="group flex flex-col gap-1 rounded-none border-b-2 border-transparent data-[state=active]:text-foreground -mb-px pt-3 px-3 pb-2 bg-transparent transition-all duration-300"
               >
-                <div
-                  className="relative h-10 w-10"
-                >
+                <div className={cn(
+                  "relative transition-all duration-300 ease-in-out h-10 w-10 overflow-hidden",
+                  isShrunk ? "md:h-0 md:opacity-0 md:scale-95" : "md:h-10 md:opacity-100 md:scale-100"
+                )}>
                   <Image
                     src="https://image2url.com/r2/default/images/1767356315406-b60c97a2-04ce-4137-8a55-6d1a8f51fef2.png"
                     alt="Stores Icon"
                     width={40}
                     height={40}
-                    className="object-contain group-data-[state=active]:brightness-110 group-data-[state=active]:scale-125 transition-all"
+                    className="object-contain transition-all"
                   />
                 </div>
-                <span className="text-xs">Stores</span>
+                <span className="text-xs transition-transform duration-300">Stores</span>
               </TabsTrigger>
               <TabsTrigger
                 value="deals"
-                className="group flex flex-col gap-1 rounded-none border-b-2 border-transparent data-[state=active]:text-foreground -mb-px pt-3 px-3 pb-2 bg-transparent"
+                className="group flex flex-col gap-1 rounded-none border-b-2 border-transparent data-[state=active]:text-foreground -mb-px pt-3 px-3 pb-2 bg-transparent transition-all duration-300"
               >
-                <div
-                  className="relative h-10 w-10 flex items-center justify-center"
-                >
+                <div className={cn(
+                  "relative transition-all duration-300 ease-in-out h-10 w-10 overflow-hidden",
+                  isShrunk ? "md:h-0 md:opacity-0 md:scale-95" : "md:h-10 md:opacity-100 md:scale-100"
+                )}>
                   <Image
                     src="https://image2url.com/r2/default/images/1767356441624-93799530-2fc0-474e-8dea-661b25e57bf4.png"
                     alt="Deals Icon"
                     width={40}
                     height={40}
-                    className="object-contain group-data-[state=active]:brightness-110 group-data-[state=active]:scale-125 transition-all"
+                    className="object-contain transition-all"
                   />
                 </div>
-                <span className="text-xs">Deals</span>
+                <span className="text-xs transition-transform duration-300">Deals</span>
               </TabsTrigger>
             </TabsList>
           </div>
-          <TabsContent value="shop">
+          <TabsContent value="shop" className="m-0">
             <HeroSection />
+            
+            {/* Category Navigation - Hidden on Mobile */}
+            <div className="hidden md:block bg-background py-6 shadow-sm border-b">
+              <div className="px-4 md:px-6">
+                <ScrollArea className="w-full whitespace-nowrap">
+                  <div className="flex w-max space-x-4 pb-4">
+                    <button
+                      onClick={() => setSelectedCategories([])}
+                      className={cn(
+                        "flex flex-col items-center justify-center min-w-[72px] gap-2 transition-all",
+                        selectedCategories.length === 0 ? "" : "opacity-60 grayscale"
+                      )}
+                    >
+                      <div className={cn(
+                        "h-14 w-14 rounded-full flex items-center justify-center shadow-lg transition-colors",
+                        selectedCategories.length === 0 ? "bg-primary text-primary-foreground" : "bg-secondary"
+                      )}>
+                        <LayoutGrid className="h-6 w-6" />
+                      </div>
+                      <span className="text-xs font-medium">All</span>
+                    </button>
+                    {categories.map((category) => {
+                      const Icon = categoryIcons[category] || LayoutGrid;
+                      const isSelected = selectedCategories.includes(category);
+                      return (
+                        <button
+                          key={category}
+                          onClick={() => toggleCategory(category)}
+                          className={cn(
+                            "flex flex-col items-center justify-center min-w-[72px] gap-2 transition-all",
+                            isSelected ? "" : "opacity-60 grayscale"
+                          )}
+                        >
+                          <div className={cn(
+                            "h-14 w-14 rounded-full flex items-center justify-center shadow-lg transition-colors",
+                            isSelected ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"
+                          )}>
+                            <Icon className="h-6 w-6" />
+                          </div>
+                          <span className="text-xs font-medium">{category}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              </div>
+            </div>
+
             <ProductView
               products={filteredProducts}
               categories={categories}
@@ -176,6 +295,7 @@ export function HomeContent() {
           </TabsContent>
         </Tabs>
       </main>
+      <MoormyBot />
     </>
   );
 }

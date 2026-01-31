@@ -2,14 +2,14 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { BottomNav } from '@/components/layout/bottom-nav';
-import { AuthBanner } from '@/components/layout/auth-banner';
 import { WishlistProvider } from '@/hooks/use-wishlist';
 import { CartProvider } from '@/hooks/use-cart';
+import { PullToRefresh } from '@/components/layout/pull-to-refresh';
+import { MainLayoutWrapper } from '@/components/layout/main-layout-wrapper';
 
 export const metadata: Metadata = {
-  title: 'Wink E-Commerce',
-  description: 'A modern e-commerce experience.',
+  title: 'E-Moorm E-Commerce',
+  description: 'A modern e-commerce experience for local Mindoro goods.',
 };
 
 export default function RootLayout({
@@ -23,21 +23,22 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossOrigin=""/>
       </head>
       <body className="font-body antialiased h-full bg-background">
-        <div className="flex flex-col min-h-screen">
-          <WishlistProvider>
-            <CartProvider>
-              <SidebarProvider>
-                <div className="flex-1 pb-28 md:pb-0">{children}</div>
-                <div className="md:hidden fixed bottom-0 left-0 right-0 z-40">
-                  <AuthBanner />
-                  <BottomNav />
-                </div>
-              </SidebarProvider>
-            </CartProvider>
-          </WishlistProvider>
-        </div>
+        <PullToRefresh>
+          <div className="flex flex-col min-h-screen">
+            <WishlistProvider>
+              <CartProvider>
+                <SidebarProvider>
+                  <MainLayoutWrapper>{children}</MainLayoutWrapper>
+                </SidebarProvider>
+              </CartProvider>
+            </WishlistProvider>
+          </div>
+        </PullToRefresh>
         <Toaster />
       </body>
     </html>

@@ -8,8 +8,10 @@ import Link from 'next/link';
 
 export function AuthBanner() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const dismissed = localStorage.getItem('auth-banner-dismissed');
     // We'll assume the user is not logged in for this example.
     // In a real app, you would also check the user's authentication status.
@@ -24,7 +26,7 @@ export function AuthBanner() {
     localStorage.setItem('auth-banner-dismissed', 'true');
   };
 
-  if (!isVisible) {
+  if (!isClient || !isVisible) {
     return null;
   }
 

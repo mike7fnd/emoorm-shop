@@ -45,7 +45,7 @@
     {
       "id": "8",
       "description": "Filipino tablea cacao balls",
-      "imageUrl": "https://images.unsplash.com/photo-1647532197692-ad9f2ecae422?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYWNhbyUyMGJhbGxzfGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1647532197692-ad9f2ecae422?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjYWNhYSUyMGJhbGxzfGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "cacao balls"
     },
     {
@@ -101,6 +101,36 @@
       "description": "A hand-painted woven bayong bag",
       "imageUrl": "https://images.unsplash.com/photo-1621990838936-39907a41a4a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmaWxpcGlubyUyMHdvemVuJTIwYmFnfGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "woven bag"
+    },
+    {
+      "id": "18",
+      "description": "A collection of essential oils",
+      "imageUrl": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxlc3NlbnRpYWwlMjBvaWxzfGVufDB8fHx8MTc2NzMzMjQxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "essential oils"
+    },
+    {
+      "id": "19",
+      "description": "A decorative wall hanging",
+      "imageUrl": "https://images.unsplash.com/photo-1523301343968-6a6ebf63c672?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx3YWxsJTIwZGVjb3J8ZW58MHx8fHwxNzY3MzMzMjAwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wall decor"
+    },
+    {
+      "id": "20",
+      "description": "Fresh fruit juice in a glass",
+      "imageUrl": "https://images.unsplash.com/photo-1622597467822-4a004845014c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxmcnVpdCUyMGp1aWNlfGVufDB8fHx8MTc2NzMzMzIwMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fruit juice"
+    },
+    {
+      "id": "21",
+      "description": "Assorted local candies",
+      "imageUrl": "https://images.unsplash.com/photo-1582050048266-3d7ec82ef7aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxsb2NhbCUyMGNhbmRpZXN8ZW58MHx8fHwxNzY3MzMzMjAwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "local candies"
+    },
+    {
+      "id": "22",
+      "description": "A traditional woven hat",
+      "imageUrl": "https://images.unsplash.com/photo-1565507853153-26f5d6e71caa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx3b3ZlbiUyMGhhdHxlbnwwfHx8fDE3NjczMzMyMDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woven hat"
     },
     {
       "id": "store-1",

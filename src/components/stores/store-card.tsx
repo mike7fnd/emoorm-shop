@@ -33,7 +33,7 @@ export function StoreCard({ store }: StoreCardProps) {
           </div>
         </CardContent>
         <CardFooter className="p-4 pt-0">
-          <Button variant="outline" className="w-full rounded-[30px]">
+          <Button className="w-full rounded-[30px]">
             Visit Store <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
         </CardFooter>

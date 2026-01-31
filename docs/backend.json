@@ -1,0 +1,241 @@
+{
+  "entities": {
+    "Product": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Product",
+      "type": "object",
+      "description": "Represents a product in the e-commerce store.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the product."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the product."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the product."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the product."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the product image.",
+          "format": "uri"
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Reference to Category. (Relationship: Category 1:N Product)"
+        },
+        "brand": {
+          "type": "string",
+          "description": "Brand of the product."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "price",
+        "imageUrl",
+        "categoryId",
+        "brand"
+      ]
+    },
+    "Category": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Category",
+      "type": "object",
+      "description": "Represents a product category.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the category."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the category."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "WishlistItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WishlistItem",
+      "type": "object",
+      "description": "Represents an item in a user's wishlist.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the wishlist item."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to UserProfile. (Relationship: UserProfile 1:N WishlistItem)"
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to Product. (Relationship: Product 1:N WishlistItem)"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "productId"
+      ]
+    },
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user profile.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user profile."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        }
+      },
+      "required": [
+        "id",
+        "email"
+      ]
+    },
+    "SellerProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SellerProfile",
+      "type": "object",
+      "description": "Represents a seller's profile, linked to a user profile.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the seller profile."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to UserProfile. (Relationship: UserProfile 1:1 SellerProfile)"
+        },
+        "shopName": {
+          "type": "string",
+          "description": "Name of the seller's shop."
+        },
+        "shopDescription": {
+          "type": "string",
+          "description": "Description of the seller's shop."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "shopName",
+        "shopDescription"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile data.  Path-based ownership ensures only the user can access their profile.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sellers/{sellerId}",
+        "definition": {
+          "entityName": "SellerProfile",
+          "schema": {
+            "$ref": "#/backend/entities/SellerProfile"
+          },
+          "description": "Stores seller profile data. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "sellerId",
+              "description": "The unique identifier of the seller."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/products/{productId}",
+        "definition": {
+          "entityName": "Product",
+          "schema": {
+            "$ref": "#/backend/entities/Product"
+          },
+          "description": "Stores product data. Read access is open to all, write access restricted to admin.",
+          "params": [
+            {
+              "name": "productId",
+              "description": "The unique identifier of the product."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/categories/{categoryId}",
+        "definition": {
+          "entityName": "Category",
+          "schema": {
+            "$ref": "#/backend/entities/Category"
+          },
+          "description": "Stores category data. Read access is open to all, write access restricted to admin.",
+          "params": [
+            {
+              "name": "categoryId",
+              "description": "The unique identifier of the category."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/wishlistItems/{wishlistItemId}",
+        "definition": {
+          "entityName": "WishlistItem",
+          "schema": {
+            "$ref": "#/backend/entities/WishlistItem"
+          },
+          "description": "Stores wishlist items for a user. Path-based ownership ensures only the user can manage their wishlist.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            },
+            {
+              "name": "wishlistItemId",
+              "description": "The unique identifier of the wishlist item."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support an e-commerce application with user profiles, seller profiles, products, categories, and wishlists. It prioritizes authorization independence and efficient data retrieval.\n\n*   **User Profiles:** User profiles are stored in `/users/{userId}`. This path-based ownership ensures that only the user can access their profile data.\n*   **Seller Profiles:** Seller profiles, linked to user profiles, are stored in `/sellers/{sellerId}`. The `userId` is denormalized into the seller profile to allow association with the respective user, this is necessary to easily get the user associated with the seller profile.\n*   **Products:** Products are stored in `/products/{productId}`.\n*   **Categories:** Categories are stored in `/categories/{categoryId}`.\n*   **Wishlists:** Wishlist items are stored in `/users/{userId}/wishlistItems/{wishlistItemId}`. This uses path-based ownership, ensuring only the user can manage their wishlist. \n\n**Authorization Independence:**  Authorization independence is achieved through path-based ownership for user-related data (user profiles and wishlists) and denormalization (copying `userId` into `SellerProfile`). This avoids the need for `get()` calls in security rules, making them more robust and efficient.\n\n**QAPs (Rules are not Filters):** The structure facilitates secure `list` operations by segregating data based on ownership or purpose. For example, listing wishlist items is performed under `/users/{userId}/wishlistItems`, which naturally filters the wishlist items to those owned by the user.  Global collections like `/products` and `/categories` will need additional access control. For now, reads are open but writes will need admin privileges. This can be implemented either using a DBAC approach (roles collection) or a custom backend function."
+  }
+}

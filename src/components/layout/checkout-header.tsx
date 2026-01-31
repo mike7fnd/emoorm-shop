@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export function CheckoutHeader() {
   return (
-    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 bg-background">
       <div className="h-16 flex items-center justify-between gap-4 px-4 sm:px-6 relative">
         <Button variant="ghost" size="icon" aria-label="Back" asChild>
           <Link href="/cart">
