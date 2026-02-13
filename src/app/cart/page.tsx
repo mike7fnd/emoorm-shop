@@ -88,7 +88,7 @@ export default function CartPage() {
       <div className="hidden md:block">
         <Header showSearch={false} />
       </div>
-      <main className="container mx-auto px-4 pt-4 pb-40 md:pb-8">
+      <main className="container mx-auto px-4 pt-4 pb-40 md:pb-8 safe-area-top">
         <h1 className="text-lg font-semibold mb-8 md:mt-0 text-left">My Cart</h1>
         {cartItems.length > 0 ? (
           <div className="grid md:grid-cols-3 gap-8 md:gap-12 items-start">
@@ -250,7 +250,7 @@ export default function CartPage() {
       </main>
 
        {cartItems.length > 0 && (
-        <div className="md:hidden fixed bottom-16 left-0 right-0 bg-background border-t p-4 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+        <div className="md:hidden fixed bottom-16 left-0 right-0 bg-background border-t p-4 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] safe-area-inset-x">
           <div className="flex justify-between items-center mb-4">
             <span className="text-lg font-bold">Total ({selectedCartItems.length}):</span>
             <span className="text-xl font-bold">₱{total.toFixed(2)}</span>

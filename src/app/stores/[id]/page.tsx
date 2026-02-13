@@ -83,7 +83,7 @@ export default function StoreDetailPage() {
 
   return (
     <>
-      <header className="bg-background">
+      <header className="bg-background safe-area-top safe-area-inset-x">
         <div className="h-16 flex items-center justify-between gap-4 px-4 sm:px-6 relative">
             <Button variant="ghost" size="icon" aria-label="Back" onClick={() => router.back()}>
                 <ChevronLeft className="h-6 w-6" />

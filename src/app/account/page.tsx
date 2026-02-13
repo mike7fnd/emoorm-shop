@@ -347,7 +347,7 @@ export default function AccountPage() {
         <div className="hidden md:block">
           <Header showSearch={false} />
         </div>
-        <main className="pb-24 md:pb-8 flex items-center justify-center min-h-[50vh]">
+        <main className="pb-24 md:pb-8 flex items-center justify-center min-h-[50vh] safe-area-top">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </main>
       </>
@@ -362,7 +362,7 @@ export default function AccountPage() {
           <Header showSearch={false} />
         </div>
         <main className="pb-24 md:pb-8">
-          <div className="md:hidden h-16 flex items-center justify-between px-4">
+          <div className="md:hidden h-16 flex items-center justify-between px-4 safe-area-top">
             <h1 className="text-lg font-semibold">My Account</h1>
           </div>
           <div className="container mx-auto px-4 pt-0 md:pt-8 relative">
@@ -388,7 +388,7 @@ export default function AccountPage() {
         <Header showSearch={false} />
       </div>
       <main className="pb-24 md:pb-8">
-         <div className="md:hidden h-16 flex items-center justify-between px-4">
+         <div className="md:hidden h-16 flex items-center justify-between px-4 safe-area-top">
             <h1 className="text-lg font-semibold">My Account</h1>
             <div className="flex items-center">
                 <Button variant="ghost" size="icon" asChild>

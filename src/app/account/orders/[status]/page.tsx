@@ -64,7 +64,7 @@ export default function OrdersPage() {
       <div className="hidden md:block">
         <Header showSearch={false} />
       </div>
-      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8">
+      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8 safe-area-top">
         <h1 className="text-lg font-semibold mb-4">My Orders</h1>
         
         <Tabs defaultValue={currentStatus} className="w-full mb-8">

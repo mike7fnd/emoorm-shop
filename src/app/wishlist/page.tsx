@@ -65,7 +65,7 @@ export default function WishlistPage() {
       <div className="hidden md:block">
         <Header showSearch={false} />
       </div>
-      <main className="container mx-auto px-4 pt-4 pb-8">
+      <main className="container mx-auto px-4 pt-4 pb-8 safe-area-top">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-lg font-semibold">My Wishlist</h1>
           {wishlistedProducts.length > 0 && (

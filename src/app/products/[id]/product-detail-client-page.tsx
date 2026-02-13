@@ -140,7 +140,7 @@ export function ProductDetailClientPage({ product, reviewSummary, similarProduct
   return (
     <>
       <header className={cn(
-        "sticky top-0 z-30 h-16 flex items-center justify-between gap-4 px-4 sm:px-6 transition-colors duration-300",
+        "sticky top-0 z-30 h-16 flex items-center justify-between gap-4 px-4 sm:px-6 transition-colors duration-300 safe-area-top safe-area-inset-x",
         headerBg ? "bg-background shadow-sm" : "bg-transparent"
       )}>
         <Button variant="ghost" size="icon" className="rounded-full bg-background/50 hover:bg-background" onClick={() => router.back()}>
@@ -396,7 +396,7 @@ export function ProductDetailClientPage({ product, reviewSummary, similarProduct
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-background border-t shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+      <div className="fixed bottom-0 left-0 right-0 z-30 bg-background border-t shadow-[0_-2px_10px_rgba(0,0,0,0.05)] safe-area-bottom safe-area-inset-x">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-2">
           {product.isAuction ? (
             <div className="flex gap-2 w-full">

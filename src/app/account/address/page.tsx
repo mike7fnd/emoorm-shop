@@ -76,7 +76,7 @@ export default function AddressPage() {
       <div className="hidden md:block">
         <Header showSearch={false} />
       </div>
-      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8">
+      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8 safe-area-top">
         {!isFormOpen ? (
           <>
             <div className="flex justify-between items-center mb-8">
