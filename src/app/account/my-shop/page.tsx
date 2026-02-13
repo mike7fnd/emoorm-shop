@@ -175,7 +175,7 @@ export default function SellerDashboardPage() {
             <div>
               <p className="text-sm text-muted-foreground">Location</p>
               <p className="text-base">
-                {sellerProfile.address && <>{sellerProfile.address}</>, {sellerProfile.city}, {sellerProfile.state} {sellerProfile.zip_code}</>
+                {sellerProfile.address ? `${sellerProfile.address}, ${sellerProfile.city}, ${sellerProfile.state} ${sellerProfile.zip_code}` : 'No location added'}
               </p>
             </div>
             <div>
@@ -184,4 +184,7 @@ export default function SellerDashboardPage() {
             </div>
           </CardContent>
         </Card>
+      </main>
+    </>
+  );
 }
