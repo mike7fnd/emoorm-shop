@@ -6,10 +6,14 @@ import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Wallet, Package, Truck, Star, LogOut, MoreVertical, Settings, HelpCircle, Users, CreditCard, Shield, MapPin, Bell, MessageSquare, Ticket, Store } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { User, Wallet, Package, Truck, Star, LogOut, MoreVertical, Settings, HelpCircle, Users, CreditCard, Shield, MapPin, Bell, MessageSquare, Ticket, Store, LogIn, UserPlus, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
+import { useUser, useAuth } from '@/supabase/provider';
+import { auth } from '@/supabase/auth';
 
 const orderStatuses = [
   { name: 'To Pay', icon: Wallet, href: '/account/orders/to-pay', count: 1 },
@@ -33,9 +37,224 @@ const mockNotifications = [
     { icon: Star, title: "Rate Product", description: "Please rate your recent purchase.", time: "3h ago" },
 ]
 
+function LoginForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = useAuth();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { error: signInError } = await auth.signInWithPassword(supabase, { email, password });
+      if (signInError) {
+        setError(signInError.message);
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during login');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Card className="max-w-md mx-auto rounded-[30px] shadow-xl">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+        <p className="text-muted-foreground text-sm">Login to your account</p>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleLogin} className="space-y-4">
+          {error && (
+            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
+              {error}
+            </div>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full rounded-full" disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <LogIn className="h-4 w-4 mr-2" />
+            )}
+            Login
+          </Button>
+          <div className="text-center text-sm">
+            <span className="text-muted-foreground">Don&apos;t have an account? </span>
+            <button
+              type="button"
+              onClick={onSwitchToSignUp}
+              className="text-primary hover:underline font-medium"
+            >
+              Sign Up
+            </button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SignUpForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const supabase = useAuth();
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { error: signUpError } = await auth.signUp(supabase, { email, password });
+      if (signUpError) {
+        setError(signUpError.message);
+      } else {
+        setSuccess(true);
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during signup');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <Card className="max-w-md mx-auto rounded-[30px] shadow-xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">Check Your Email</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center space-y-4">
+          <p className="text-muted-foreground">
+            We&apos;ve sent a confirmation email to <strong>{email}</strong>.
+            Please check your inbox and click the link to verify your account.
+          </p>
+          <Button onClick={onSwitchToLogin} className="w-full rounded-full">
+            Back to Login
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="max-w-md mx-auto rounded-[30px] shadow-xl">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
+        <p className="text-muted-foreground text-sm">Sign up for a new account</p>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSignUp} className="space-y-4">
+          {error && (
+            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
+              {error}
+            </div>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="signup-email">Email</Label>
+            <Input
+              id="signup-email"
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="signup-password">Password</Label>
+            <Input
+              id="signup-password"
+              type="password"
+              placeholder="At least 6 characters"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password">Confirm Password</Label>
+            <Input
+              id="confirm-password"
+              type="password"
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full rounded-full" disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <UserPlus className="h-4 w-4 mr-2" />
+            )}
+            Sign Up
+          </Button>
+          <div className="text-center text-sm">
+            <span className="text-muted-foreground">Already have an account? </span>
+            <button
+              type="button"
+              onClick={onSwitchToLogin}
+              className="text-primary hover:underline font-medium"
+            >
+              Login
+            </button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function AccountPage() {
+  const { user, isLoading: isUserLoading } = useUser();
+  const supabase = useAuth();
   const [avatarSrc, setAvatarSrc] = useState('https://picsum.photos/seed/user/100/100');
   const [hasShop, setHasShop] = useState(false);
+  const [showLoginForm, setShowLoginForm] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -43,7 +262,7 @@ export default function AccountPage() {
     if (savedAvatar) {
       setAvatarSrc(savedAvatar);
     }
-    
+
     const sellerProfile = localStorage.getItem('seller-profile');
     if (sellerProfile) {
       setHasShop(true);
@@ -68,6 +287,51 @@ export default function AccountPage() {
     }
   };
 
+  const handleSignOut = async () => {
+    await auth.signOut(supabase);
+  };
+
+  // Show loading state while checking auth
+  if (isUserLoading) {
+    return (
+      <>
+        <div className="hidden md:block">
+          <Header showSearch={false} />
+        </div>
+        <main className="pb-24 md:pb-8 flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+      </>
+    );
+  }
+
+  // Show login/signup form if not logged in
+  if (!user) {
+    return (
+      <>
+        <div className="hidden md:block">
+          <Header showSearch={false} />
+        </div>
+        <main className="pb-24 md:pb-8">
+          <div className="md:hidden h-16 flex items-center justify-between px-4">
+            <h1 className="text-lg font-semibold">My Account</h1>
+          </div>
+          <div className="container mx-auto px-4 pt-0 md:pt-8 relative">
+            {showLoginForm ? (
+              <LoginForm onSwitchToSignUp={() => setShowLoginForm(false)} />
+            ) : (
+              <SignUpForm onSwitchToLogin={() => setShowLoginForm(true)} />
+            )}
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  // User is logged in - show account page
+  const userEmail = user.email || 'User';
+  const userName = user.user_metadata?.name || userEmail.split('@')[0] || 'User';
+  const userAvatar = user.user_metadata?.avatar_url || avatarSrc;
 
   return (
     <>
@@ -130,7 +394,10 @@ export default function AccountPage() {
                         </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-destructive focus:text-destructive rounded-md">
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive rounded-md cursor-pointer"
+                      onClick={handleSignOut}
+                    >
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Sign Out</span>
                     </DropdownMenuItem>
@@ -152,14 +419,14 @@ export default function AccountPage() {
                         />
                         <button onClick={handleAvatarClick} className="relative group">
                             <Avatar className="h-24 w-24 mb-4 border-4 border-background shadow-lg">
-                                <AvatarImage src={avatarSrc} data-ai-hint="portrait" />
+                                <AvatarImage src={userAvatar} data-ai-hint="portrait" />
                                 <AvatarFallback>
                                     <User className="h-10 w-10" />
                                 </AvatarFallback>
                             </Avatar>
                         </button>
-                        <h1 className="text-2xl font-bold">John Doe</h1>
-                        <p className="text-muted-foreground">john.doe@example.com</p>
+                        <h1 className="text-2xl font-bold">{userName}</h1>
+                        <p className="text-muted-foreground">{userEmail}</p>
                     </div>
                 </CardContent>
             </Card>

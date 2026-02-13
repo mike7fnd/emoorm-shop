@@ -3,22 +3,34 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Heart, ShoppingCart } from 'lucide-react';
+import { X, Heart, ShoppingCart, LogIn, UserPlus } from 'lucide-react';
 import Link from 'next/link';
+import { useUser } from '@/supabase/provider';
 
 export function AuthBanner() {
   const [isVisible, setIsVisible] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const { user, isLoading } = useUser();
 
   useEffect(() => {
     setIsClient(true);
-    const dismissed = localStorage.getItem('auth-banner-dismissed');
-    // We'll assume the user is not logged in for this example.
-    // In a real app, you would also check the user's authentication status.
-    if (dismissed !== 'true') {
-      setIsVisible(true);
-    }
   }, []);
+
+  // Check if banner was dismissed or user is logged in
+  useEffect(() => {
+    if (isClient && !isLoading) {
+      // Only show banner if user is NOT logged in and not still loading
+      if (!user) {
+        const dismissed = localStorage.getItem('auth-banner-dismissed');
+        if (dismissed !== 'true') {
+          setIsVisible(true);
+        }
+      } else {
+        // User is logged in, hide the banner
+        setIsVisible(false);
+      }
+    }
+  }, [isClient, isLoading, user]);
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -26,29 +38,47 @@ export function AuthBanner() {
     localStorage.setItem('auth-banner-dismissed', 'true');
   };
 
-  if (!isClient || !isVisible) {
+  // Don't render if still loading or user is logged in or not visible
+  if (!isClient || isLoading || !isVisible || user) {
     return null;
   }
 
   return (
-    <div className="bg-accent text-accent-foreground p-1 shadow-md">
+    <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-2 shadow-md">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-             <div className="hidden sm:flex gap-1.5 text-primary">
-                <Heart className="h-4 w-4" />
-                <ShoppingCart className="h-4 w-4" />
+            <div className="hidden sm:flex gap-1.5">
+              <Heart className="h-4 w-4" />
+              <ShoppingCart className="h-4 w-4" />
             </div>
-             <p className="font-semibold text-xs">Login for a better experience</p>
+            <p className="font-semibold text-sm">Login for a better experience and exclusive offers!</p>
           </div>
-          <div className="flex items-center gap-1">
-            <Button asChild size="sm" className="rounded-full h-6 text-xs px-3">
-                <Link href="/account">Sign Up</Link>
+          <div className="flex items-center gap-2">
+            <Button
+              asChild
+              size="sm"
+              className="rounded-full h-8 text-xs px-4 bg-white text-primary hover:bg-white/90"
+            >
+              <Link href="/account">
+                <LogIn className="h-3 w-3 mr-1" />
+                Login
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="sm"
+              className="rounded-full h-8 text-xs px-4 bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+            >
+              <Link href="/account">
+                <UserPlus className="h-3 w-3 mr-1" />
+                Sign Up
+              </Link>
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 rounded-full flex-shrink-0"
+              className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 text-white"
               onClick={handleDismiss}
               aria-label="Dismiss banner"
             >
