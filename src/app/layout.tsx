@@ -10,6 +10,7 @@ import { SupabaseClientProvider } from '@/supabase/client-provider';
 import { SupabaseErrorListener } from '@/components/SupabaseErrorListener';
 import { ServiceWorkerRegistration } from '@/components/service-worker-registration';
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt';
+import { OnboardingSplash } from '@/components/onboarding/onboarding-splash';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -63,6 +64,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
       <body className="font-body antialiased h-full bg-background">
+        <OnboardingSplash />
         <ServiceWorkerRegistration />
         <PWAInstallPrompt />
         <SupabaseClientProvider>
