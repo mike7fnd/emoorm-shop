@@ -1,11 +1,14 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { UserPlus, MessageCircle, MapPin } from 'lucide-react';
+import { UserPlus, UserCheck, MessageCircle, MapPin, Loader2 } from 'lucide-react';
 import type { Store } from '@/lib/data';
+import { storeService } from '@/supabase/services/stores';
+import { useUser } from '@/supabase/provider';
 
 type StoreInfoCardProps = {
   store: Store;
@@ -19,6 +22,46 @@ const formatFollowers = (num: number) => {
 };
 
 export function StoreInfoCard({ store }: StoreInfoCardProps) {
+  const { user } = useUser();
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isLoadingFollow, setIsLoadingFollow] = useState(false);
+  const [followerCount, setFollowerCount] = useState(store.followers);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const checkFollow = async () => {
+      const following = await storeService.isFollowing(user.id, store.id);
+      setIsFollowing(following);
+    };
+    checkFollow();
+  }, [user?.id, store.id]);
+
+  useEffect(() => {
+    setFollowerCount(store.followers);
+  }, [store.followers]);
+
+  const handleFollowToggle = async () => {
+    if (!user?.id || isLoadingFollow) return;
+    setIsLoadingFollow(true);
+    try {
+      if (isFollowing) {
+        const success = await storeService.unfollowStore(user.id, store.id);
+        if (success) {
+          setIsFollowing(false);
+          setFollowerCount((prev) => Math.max(prev - 1, 0));
+        }
+      } else {
+        const success = await storeService.followStore(user.id, store.id);
+        if (success) {
+          setIsFollowing(true);
+          setFollowerCount((prev) => prev + 1);
+        }
+      }
+    } finally {
+      setIsLoadingFollow(false);
+    }
+  };
+
   return (
     <div className="relative">
       <div className="relative h-48 md:h-64 w-full rounded-[30px] overflow-hidden shadow-card-shadow">
@@ -48,7 +91,7 @@ export function StoreInfoCard({ store }: StoreInfoCardProps) {
               </div>
               <div className="h-10 w-px bg-border" />
               <div className="flex flex-col items-center gap-1">
-                <span className="text-lg font-bold">{formatFollowers(store.followers)}</span>
+                <span className="text-lg font-bold">{formatFollowers(followerCount)}</span>
                 <span className="text-xs text-muted-foreground">Followers</span>
               </div>
               <div className="h-10 w-px bg-border" />
@@ -59,9 +102,20 @@ export function StoreInfoCard({ store }: StoreInfoCardProps) {
             </div>
 
             <div className="flex w-full items-center gap-2">
-              <Button className="w-full rounded-[30px]">
-                <UserPlus className="mr-2 h-4 w-4" />
-                Follow
+              <Button
+                className="w-full rounded-[30px]"
+                variant={isFollowing ? 'outline' : 'default'}
+                onClick={handleFollowToggle}
+                disabled={!user || isLoadingFollow}
+              >
+                {isLoadingFollow ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : isFollowing ? (
+                  <UserCheck className="mr-2 h-4 w-4" />
+                ) : (
+                  <UserPlus className="mr-2 h-4 w-4" />
+                )}
+                {isFollowing ? 'Following' : 'Follow'}
               </Button>
               <Button variant="outline" className="w-full rounded-[30px]">
                 <MessageCircle className="mr-2 h-4 w-4" />

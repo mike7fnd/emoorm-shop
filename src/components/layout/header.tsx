@@ -3,7 +3,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Heart, User, ShoppingBag, Filter } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Search, Heart, User, ShoppingBag, Filter, Package, ShoppingCart, MessageSquare, ArrowLeftRight, Settings, Store, MapPin, CreditCard, HelpCircle, Shield, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useRef, useEffect, useMemo } from "react";
@@ -12,7 +13,18 @@ import { Filters } from "@/components/products/filters";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SearchDropdown } from "./search-dropdown";
 import { useSearchHistory } from "@/hooks/use-search-history";
-import { products, type Product } from "@/lib/data";
+import { type Product } from "@/lib/data";
+import { useAllProducts } from "@/hooks/use-all-products";
+import { useUser, useAuth } from "@/supabase/provider";
+import { auth } from "@/supabase/auth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type FilterProps = {
   brands: string[];
@@ -30,6 +42,7 @@ type FilterProps = {
 
 
 export function Header(props: Partial<FilterProps>) {
+  const pathname = usePathname();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const showSearch = props.showSearch !== false;
@@ -37,6 +50,58 @@ export function Header(props: Partial<FilterProps>) {
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const { searchHistory, addSearchTerm, clearSearchHistory } = useSearchHistory();
   const [localSearch, setLocalSearch] = useState(props.searchQuery || '');
+  const { products } = useAllProducts();
+
+  const isSellerMode = pathname.startsWith('/account/my-shop');
+  const { user } = useUser();
+  const supabase = useAuth();
+  const [sellerProfileId, setSellerProfileId] = useState<string | null>(null);
+  const [avatarSrc, setAvatarSrc] = useState('https://picsum.photos/seed/user/100/100');
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const loadUserData = async () => {
+      try {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', user.id)
+          .single();
+        if (profileData?.avatar_url) setAvatarSrc(profileData.avatar_url);
+      } catch {}
+    };
+    loadUserData();
+
+    const handleAvatarUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      setAvatarSrc(customEvent.detail.newAvatar);
+    };
+    window.addEventListener('avatar-updated', handleAvatarUpdate);
+    return () => window.removeEventListener('avatar-updated', handleAvatarUpdate);
+  }, [user?.id, supabase]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const loadSellerId = async () => {
+      try {
+        const { data } = await supabase
+          .from('seller_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+        if (data) setSellerProfileId(data.id);
+      } catch {}
+    };
+    loadSellerId();
+  }, [user?.id, supabase]);
+
+  const handleSignOut = async () => {
+    await auth.signOut(supabase);
+  };
+
+  const userEmail = user?.email || 'User';
+  const userName = user?.user_metadata?.name || userEmail.split('@')[0] || 'User';
+  const userAvatar = user?.user_metadata?.avatar_url || avatarSrc;
 
   const suggestions = localSearch ? products.filter(p => p.name.toLowerCase().includes(localSearch.toLowerCase())).slice(0, 5) : [];
 
@@ -76,7 +141,7 @@ export function Header(props: Partial<FilterProps>) {
     }
 
     return recommendations;
-}, [searchHistory]);
+}, [searchHistory, products]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -123,7 +188,7 @@ export function Header(props: Partial<FilterProps>) {
   const isDropdownOpen = isFilterOpen || isSearchOpen;
 
   return (
-    <header className="sticky top-0 z-40 md:bg-background safe-area-top safe-area-inset-x">
+    <header className="sticky top-0 z-40 md:bg-background">
       <div className="h-16 md:h-20 flex items-center justify-between gap-4 px-4 sm:px-6 relative">
         <Link href="/" className="hidden md:flex items-center mr-2">
           <Image 
@@ -212,25 +277,166 @@ export function Header(props: Partial<FilterProps>) {
           </div>
         )}
         
+        {/* Seller mode: centered nav links */}
+        {isSellerMode && (
+          <div className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+            {[
+              { href: '/account/my-shop', label: 'Dashboard' },
+              { href: '/account/my-shop/products', label: 'Products' },
+              { href: '/account/my-shop/orders', label: 'Orders' },
+              { href: '/account/my-shop/messages', label: 'Messages' },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "relative text-sm font-medium py-1 transition-colors",
+                  pathname === item.href
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {item.label}
+                {pathname === item.href && (
+                  <span className="absolute left-0 right-0 -bottom-1 h-0.5 bg-primary rounded-full" />
+                )}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Right side icons */}
         <div className={cn(
           "hidden md:flex items-center gap-2",
-          showSearch ? "ml-auto" : "ml-auto"
+          "ml-auto"
         )}>
-          <Button variant="ghost" size="icon" aria-label="Wishlist" asChild>
-            <Link href="/wishlist">
-              <Heart className="h-5 w-5" />
-            </Link>
-          </Button>
-          <Button variant="ghost" size="icon" aria-label="Cart" asChild>
-             <Link href="/cart">
-              <ShoppingBag className="h-5 w-5" />
-            </Link>
-          </Button>
-          <Button variant="ghost" size="icon" aria-label="Account" asChild>
-            <Link href="/account">
-              <User className="h-5 w-5" />
-            </Link>
-          </Button>
+          {isSellerMode ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Seller menu">
+                  <User className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {sellerProfileId && (
+                  <DropdownMenuItem asChild>
+                    <Link href={`/stores/${sellerProfileId}`} className="flex items-center gap-2 cursor-pointer">
+                      <Store className="h-4 w-4" />
+                      View Public Store
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem asChild>
+                  <Link href="/account" className="flex items-center gap-2 cursor-pointer">
+                    <ArrowLeftRight className="h-4 w-4" />
+                    Switch to Personal
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/account/my-shop/settings" className="flex items-center gap-2 cursor-pointer">
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Button variant="ghost" size="icon" aria-label="Wishlist" asChild>
+                <Link href="/wishlist">
+                  <Heart className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="ghost" size="icon" aria-label="Cart" asChild>
+                <Link href="/cart">
+                  <ShoppingBag className="h-5 w-5" />
+                </Link>
+              </Button>
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" aria-label="Account" className="rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={userAvatar} data-ai-hint="portrait" />
+                        <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-[220px] rounded-xl">
+                    <div className="px-3 py-2">
+                      <p className="text-sm font-semibold truncate">{userName}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">{userEmail}</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/account" className="flex items-center gap-2 cursor-pointer">
+                        <User className="h-4 w-4" />
+                        My Account
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={sellerProfileId ? '/account/my-shop' : '/account/seller-registration'} className="flex items-center gap-2 cursor-pointer">
+                        <Store className="h-4 w-4" />
+                        {sellerProfileId ? 'My Shop' : 'Be a Seller'}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/account/settings" className="flex items-center gap-2 cursor-pointer">
+                        <Settings className="h-4 w-4" />
+                        Account Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/account/address" className="flex items-center gap-2 cursor-pointer">
+                        <MapPin className="h-4 w-4" />
+                        Shipping Addresses
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/account/payment" className="flex items-center gap-2 cursor-pointer">
+                        <CreditCard className="h-4 w-4" />
+                        Payment Methods
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/account/help" className="flex items-center gap-2 cursor-pointer">
+                        <HelpCircle className="h-4 w-4" />
+                        Help Center
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/account/privacy" className="flex items-center gap-2 cursor-pointer">
+                        <Shield className="h-4 w-4" />
+                        Privacy Policy
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/account/switch" className="flex items-center gap-2 cursor-pointer">
+                        <Users className="h-4 w-4" />
+                        Switch Account
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={handleSignOut}
+                      className="text-destructive focus:text-destructive cursor-pointer"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button variant="ghost" size="icon" aria-label="Account" asChild>
+                  <Link href="/account">
+                    <User className="h-5 w-5" />
+                  </Link>
+                </Button>
+              )}
+            </>
+          )}
         </div>
       </div>
       {isMobile && (

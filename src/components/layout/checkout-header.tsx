@@ -2,21 +2,24 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function CheckoutHeader() {
   return (
-    <header className="sticky top-0 z-40 bg-background safe-area-top safe-area-inset-x">
-      <div className="h-16 flex items-center justify-between gap-4 px-4 sm:px-6 relative">
-        <Button variant="ghost" size="icon" aria-label="Back" asChild>
+    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm">
+      <div className="h-14 flex items-center justify-between px-3">
+        <Button variant="ghost" size="icon" aria-label="Back" asChild className="shrink-0">
           <Link href="/cart">
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-5 w-5" />
           </Link>
         </Button>
-        <div className="absolute left-1/2 -translate-x-1/2">
-            <h1 className="text-lg font-semibold">Checkout</h1>
-        </div>
+        <h1 className="text-base font-semibold truncate mx-2">Checkout</h1>
+        <Button variant="ghost" size="icon" aria-label="Notifications" asChild className="shrink-0">
+          <Link href="/account/notifications">
+            <Bell className="h-5 w-5" />
+          </Link>
+        </Button>
       </div>
     </header>
   );

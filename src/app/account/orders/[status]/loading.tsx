@@ -24,7 +24,7 @@ export default function OrdersLoading() {
 
         <div className="space-y-6">
           {[...Array(2)].map((_, i) => (
-            <div key={i} className="border rounded-[15px] p-4 space-y-4">
+            <div key={i} className="rounded-[15px] p-4 space-y-4 shadow-card-shadow">
               <div className="flex justify-between items-center">
                 <Skeleton className="h-5 w-32" />
                 <Skeleton className="h-4 w-20" />

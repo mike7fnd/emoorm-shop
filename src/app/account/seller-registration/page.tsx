@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AccountHeader } from '@/components/layout/account-header';
+import { AccountPageLayout } from '@/components/layout/account-page-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -93,31 +93,30 @@ export default function SellerRegistrationPage() {
   };
 
   return (
-    <>
-      <AccountHeader title="Seller Registration" />
-      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8">
-        <div className="max-w-2xl mx-auto space-y-8">
+    <AccountPageLayout title="Seller Registration">
+      <div className="pt-4 md:pt-0">
+        <div className="max-w-2xl mx-auto md:mx-0 space-y-8">
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">Start Selling on E-Moorm</h1>
             <p className="text-muted-foreground">Join our community of local artisans and producers from Mindoro.</p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <Card className="border-primary/20 bg-primary/5 shadow-card-shadow">
+            <Card className="bg-primary/5 shadow-card-shadow">
               <CardContent className="p-4 flex flex-col items-center text-center gap-2">
                 <Store className="h-8 w-8 text-primary" />
                 <p className="text-xs font-semibold uppercase">Your Shop</p>
                 <p className="text-[10px] text-muted-foreground leading-tight">Create a unique identity for your brand.</p>
               </CardContent>
             </Card>
-            <Card className="border-primary/20 bg-primary/5 shadow-card-shadow">
+            <Card className="bg-primary/5 shadow-card-shadow">
               <CardContent className="p-4 flex flex-col items-center text-center gap-2">
                 <ShoppingBag className="h-8 w-8 text-primary" />
                 <p className="text-xs font-semibold uppercase">List Products</p>
                 <p className="text-[10px] text-muted-foreground leading-tight">Reach thousands of customers instantly.</p>
               </CardContent>
             </Card>
-            <Card className="border-primary/20 bg-primary/5 shadow-card-shadow">
+            <Card className="bg-primary/5 shadow-card-shadow">
               <CardContent className="p-4 flex flex-col items-center text-center gap-2">
                 <Truck className="h-8 w-8 text-primary" />
                 <p className="text-xs font-semibold uppercase">Grow Fast</p>
@@ -126,7 +125,7 @@ export default function SellerRegistrationPage() {
             </Card>
           </div>
 
-          <Card className="rounded-[30px] shadow-card-shadow border-none">
+          <Card className="rounded-[30px] shadow-card-shadow">
             <CardHeader>
               <CardTitle>Shop Details</CardTitle>
               <CardDescription>Tell us about your business to get started.</CardDescription>
@@ -135,11 +134,11 @@ export default function SellerRegistrationPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="shopName">Shop Name *</Label>
-                  <Input 
-                    id="shopName" 
+                  <Input
+                    id="shopName"
                     name="shopName"
-                    placeholder="e.g. Mangyan Heritage Crafts" 
-                    required 
+                    placeholder="e.g. Mangyan Heritage Crafts"
+                    required
                     value={formData.shopName}
                     onChange={handleChange}
                     className="rounded-xl"
@@ -147,11 +146,11 @@ export default function SellerRegistrationPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="shopDescription">Shop Description *</Label>
-                  <Textarea 
-                    id="shopDescription" 
+                  <Textarea
+                    id="shopDescription"
                     name="shopDescription"
-                    placeholder="Tell customers what makes your shop special..." 
-                    required 
+                    placeholder="Tell customers what makes your shop special..."
+                    required
                     value={formData.shopDescription}
                     onChange={handleChange}
                     className="rounded-xl min-h-[100px]"
@@ -159,10 +158,10 @@ export default function SellerRegistrationPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="businessAddress">Business Address</Label>
-                  <Input 
-                    id="businessAddress" 
+                  <Input
+                    id="businessAddress"
                     name="businessAddress"
-                    placeholder="e.g. Calapan City, Oriental Mindoro" 
+                    placeholder="e.g. Calapan City, Oriental Mindoro"
                     value={formData.businessAddress}
                     onChange={handleChange}
                     className="rounded-xl"
@@ -170,10 +169,10 @@ export default function SellerRegistrationPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phoneNumber">Contact Number</Label>
-                  <Input 
-                    id="phoneNumber" 
+                  <Input
+                    id="phoneNumber"
                     name="phoneNumber"
-                    placeholder="e.g. +63 9XX XXX XXXX" 
+                    placeholder="e.g. +63 9XX XXX XXXX"
                     value={formData.phoneNumber}
                     onChange={handleChange}
                     className="rounded-xl"
@@ -186,7 +185,7 @@ export default function SellerRegistrationPage() {
             </CardContent>
           </Card>
         </div>
-      </main>
-    </>
+      </div>
+    </AccountPageLayout>
   );
 }

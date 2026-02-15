@@ -18,7 +18,7 @@ export function MobileNav() {
   }
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 safe-area-inset-x">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40">
       <AuthBanner />
       <SellerNav />
       <BottomNav />

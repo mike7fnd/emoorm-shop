@@ -1,7 +1,8 @@
 
 'use client';
 
-import { AccountHeader } from '@/components/layout/account-header';
+import { AccountPageLayout } from '@/components/layout/account-page-layout';
+import { Card } from '@/components/ui/card';
 import { Truck, Ticket, Star, Tag, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 
@@ -18,28 +19,30 @@ const mockNotifications = [
 
 export default function NotificationsPage() {
   return (
-    <>
-      <AccountHeader title="Notifications" />
-      <main className="pb-24 md:pb-8">
-        <ul className="divide-y">
-            {mockNotifications.map(notification => (
-                <li key={notification.id} className={notification.unread ? 'bg-accent/50' : ''}>
-                    <Link href="#" className="block hover:bg-accent transition-colors">
-                        <div className="flex items-start gap-4 p-4 container mx-auto">
-                            <div className="h-12 w-12 flex-shrink-0 flex items-center justify-center bg-primary/10 rounded-full">
-                                <notification.icon className="h-6 w-6 text-primary" />
-                            </div>
-                            <div className="flex-1">
-                                <p className="font-semibold">{notification.title}</p>
-                                <p className="text-sm text-muted-foreground">{notification.description}</p>
-                            </div>
-                             <p className="text-xs text-muted-foreground whitespace-nowrap">{notification.time}</p>
-                        </div>
-                    </Link>
-                </li>
-            ))}
-        </ul>
-      </main>
-    </>
+    <AccountPageLayout title="Notifications">
+      <div className="pt-4 md:pt-0">
+        <h1 className="hidden md:block text-2xl font-bold mb-6">Notifications</h1>
+        <Card className="rounded-[20px] shadow-card-shadow overflow-hidden">
+          <ul className="divide-y">
+              {mockNotifications.map(notification => (
+                  <li key={notification.id} className={notification.unread ? 'bg-accent/50' : ''}>
+                      <Link href="#" className="block hover:bg-accent transition-colors">
+                          <div className="flex items-start gap-4 p-4">
+                              <div className="h-12 w-12 flex-shrink-0 flex items-center justify-center bg-primary/10 rounded-full">
+                                  <notification.icon className="h-6 w-6 text-primary" />
+                              </div>
+                              <div className="flex-1">
+                                  <p className="font-semibold">{notification.title}</p>
+                                  <p className="text-sm text-muted-foreground">{notification.description}</p>
+                              </div>
+                               <p className="text-xs text-muted-foreground whitespace-nowrap">{notification.time}</p>
+                          </div>
+                      </Link>
+                  </li>
+              ))}
+          </ul>
+        </Card>
+      </div>
+    </AccountPageLayout>
   );
 }

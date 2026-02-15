@@ -1,7 +1,7 @@
 
 'use client';
 
-import { AccountHeader } from '@/components/layout/account-header';
+import { AccountPageLayout } from '@/components/layout/account-page-layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
@@ -27,10 +27,9 @@ const faqItems = [
 
 export default function HelpPage() {
   return (
-    <>
-      <AccountHeader title="Help Center" />
-      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8">
-        <h1 className="text-xl font-bold mb-4">Frequently Asked Questions</h1>
+    <AccountPageLayout title="Help Center">
+      <div className="pt-4 md:pt-0">
+        <h1 className="text-xl font-bold mb-4 md:text-2xl md:mb-6">Frequently Asked Questions</h1>
         <Card>
             <CardContent className="p-4">
                  <Accordion type="single" collapsible className="w-full">
@@ -45,7 +44,7 @@ export default function HelpPage() {
                 </Accordion>
             </CardContent>
         </Card>
-      </main>
-    </>
+      </div>
+    </AccountPageLayout>
   );
 }

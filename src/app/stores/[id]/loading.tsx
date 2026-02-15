@@ -27,7 +27,7 @@ export default function StoreDetailLoading() {
         {/* Store Info Card Skeleton */}
         <div className="relative">
             <Skeleton className="h-48 md:h-64 w-full rounded-[30px]" />
-            <div className="relative mx-auto -mt-20 max-w-md rounded-[30px] bg-card border shadow-xl p-6">
+            <div className="relative mx-auto -mt-20 max-w-md rounded-[30px] bg-card shadow-xl p-6">
                 <div className="flex flex-col items-center text-center">
                     <Skeleton className="h-7 w-48 mb-2" />
                     <Skeleton className="h-4 w-32 mb-6" />

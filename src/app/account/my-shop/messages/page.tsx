@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AccountHeader } from '@/components/layout/account-header';
+import { SellerPageLayout } from '@/components/layout/seller-page-layout';
 import { MessageSquare } from 'lucide-react';
 import { useUser } from '@/supabase/provider';
 import { sellerService } from '@/supabase/services/seller';
@@ -40,17 +40,16 @@ export default function MessagesPage() {
   }
 
   return (
-    <>
-      <AccountHeader title="Messages" />
-      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8">
+    <SellerPageLayout title="Messages">
+      <div className="pt-4 md:pt-0">
         <h1 className="text-2xl font-bold mb-8">Customer Messages</h1>
 
-        <div className="text-center py-16 bg-muted/30 rounded-[30px] border-2 border-dashed">
+        <div className="text-center py-16 bg-muted/30 rounded-[30px]">
           <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-semibold">No messages yet</h3>
           <p className="text-muted-foreground">Messages from customers will appear here when you start selling.</p>
         </div>
-      </main>
-    </>
+      </div>
+    </SellerPageLayout>
   );
 }

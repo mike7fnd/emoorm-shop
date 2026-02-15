@@ -5,9 +5,9 @@ import { useState, useMemo } from 'react';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { ProductGrid } from '@/components/products/product-grid';
-import { products } from '@/lib/data';
 import type { Product } from '@/lib/data';
 import { useWishlist } from '@/hooks/use-wishlist';
+import { useAllProducts } from '@/hooks/use-all-products';
 import Link from 'next/link';
 import { Heart, Share2, ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import {
@@ -23,6 +23,7 @@ type SortOption = 'date-desc' | 'price-asc' | 'price-desc';
 
 export default function WishlistPage() {
   const { wishlist } = useWishlist();
+  const { products, isLoaded } = useAllProducts();
   const [sortOption, setSortOption] = useState<SortOption>('date-desc');
   const { toast } = useToast();
 
@@ -39,7 +40,7 @@ export default function WishlistPage() {
         return originalOrderProducts.reverse();
     }
   }, [wishlist, sortOption]);
-  
+
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     toast({
@@ -78,8 +79,8 @@ export default function WishlistPage() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon" className="rounded-full md:w-auto md:px-3 md:justify-start">
                     <ArrowUpDown className="h-4 w-4 md:mr-2" />
-                     <span className="hidden md:inline">{getSortLabel(sortOption)}</span>
-                     <span className="sr-only">Sort products</span>
+                    <span className="hidden md:inline">{getSortLabel(sortOption)}</span>
+                    <span className="sr-only">Sort products</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -94,7 +95,7 @@ export default function WishlistPage() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-               <DropdownMenu>
+              <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
                     <MoreHorizontal className="h-4 w-4" />
@@ -113,15 +114,15 @@ export default function WishlistPage() {
             </div>
           )}
         </div>
-        
+
         {wishlistedProducts.length > 0 ? (
           <ProductGrid products={wishlistedProducts} showMoveToCart={true} />
         ) : (
           <div className="text-center py-16">
             <div className="flex justify-center mb-4">
-                <div className="flex items-center justify-center w-24 h-24 bg-secondary rounded-full">
-                    <Heart className="w-12 h-12 text-muted-foreground" />
-                </div>
+              <div className="flex items-center justify-center w-24 h-24 bg-secondary rounded-full">
+                <Heart className="w-12 h-12 text-muted-foreground" />
+              </div>
             </div>
             <h2 className="text-2xl font-semibold mb-2">Your wishlist is empty</h2>
             <p className="text-muted-foreground mb-8">Looks like you haven’t added anything to your wishlist yet.</p>

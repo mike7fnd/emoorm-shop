@@ -40,10 +40,11 @@ export function BottomNav() {
 
   const isActive = (href: string) => pathname === href || (href === "/account" && pathname.startsWith("/account") && !pathname.startsWith("/account/my-shop"));
 
-  // Hide regular nav when on seller path
-  const isSellerPath = pathname.startsWith('/account/my-shop');
-  
-  if (isSellerPath) {
+  // Only show bottom nav on main pages
+  const mainPages = ['/', '/wishlist', '/cart', '/account'];
+  const isMainPage = mainPages.includes(pathname);
+
+  if (!isMainPage) {
     return null;
   }
 

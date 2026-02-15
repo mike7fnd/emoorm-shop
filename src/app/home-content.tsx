@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { ProductView } from '@/components/products/product-view';
-import { products, categories, brands, stores } from '@/lib/data';
+import { products as staticProducts, categories as staticCategories, brands as staticBrands, stores as staticStores, type Product, type Store } from '@/lib/data';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StoreCard } from '@/components/stores/store-card';
 import { ProductGrid } from '@/components/products/product-grid';
@@ -25,6 +25,9 @@ import {
 } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { MoormyBot } from '@/components/chat/moormy-bot';
+import { productService } from '@/supabase/services/products';
+import { storeService } from '@/supabase/services/stores';
+import { dbProductToProduct, storeViewToStore } from '@/lib/db-adapters';
 
 const MAX_PRICE = 15000;
 
@@ -52,6 +55,47 @@ export function HomeContent() {
   const [isClient, setIsClient] = useState(false);
   const [isShrunk, setIsShrunk] = useState(false);
   const tabContainerRef = useRef<HTMLDivElement>(null);
+
+  // Real data state - merged static + DB
+  const [allProducts, setAllProducts] = useState<Product[]>(staticProducts);
+  const [allStores, setAllStores] = useState<Store[]>(staticStores);
+  const [allCategories, setAllCategories] = useState<string[]>(staticCategories);
+  const [allBrands, setAllBrands] = useState<string[]>(staticBrands);
+  const [dbDataLoaded, setDbDataLoaded] = useState(false);
+
+  // Load real data from Supabase on mount
+  useEffect(() => {
+    const loadDbData = async () => {
+      try {
+        const [dbProducts, dbStores] = await Promise.all([
+          productService.getAllProducts(),
+          storeService.getAllStores(),
+        ]);
+
+        // Merge DB products with static (DB first, then static as fallback)
+        const dbConverted = dbProducts.map(dbProductToProduct);
+        const mergedProducts = [...dbConverted, ...staticProducts];
+        setAllProducts(mergedProducts);
+
+        // Merge DB stores with static
+        const dbStoresConverted = dbStores.map(storeViewToStore);
+        const mergedStores = [...dbStoresConverted, ...staticStores];
+        setAllStores(mergedStores);
+
+        // Update categories and brands from merged data
+        const cats = [...new Set(mergedProducts.map(p => p.category))];
+        const brnds = [...new Set(mergedProducts.map(p => p.brand))];
+        setAllCategories(cats);
+        setAllBrands(brnds);
+      } catch (error) {
+        console.error('Failed to load DB data, using static fallback:', error);
+      } finally {
+        setDbDataLoaded(true);
+      }
+    };
+
+    loadDbData();
+  }, []);
 
   useEffect(() => {
     setIsClient(true);
@@ -102,7 +146,7 @@ export function HomeContent() {
 
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
+    return allProducts.filter((product) => {
       const categoryMatch =
         selectedCategories.length === 0 ||
         selectedCategories.includes(product.category);
@@ -115,9 +159,9 @@ export function HomeContent() {
         product.description.toLowerCase().includes(searchQuery.toLowerCase());
       return categoryMatch && brandMatch && priceMatch && searchMatch;
     });
-  }, [selectedCategories, selectedBrands, priceRange, searchQuery]);
+  }, [allProducts, selectedCategories, selectedBrands, priceRange, searchQuery]);
   
-  const dealProducts = useMemo(() => products.slice(0, 4), []);
+  const dealProducts = useMemo(() => allProducts.filter(p => p.onSale).slice(0, 8), [allProducts]);
 
   const handleClearFilters = () => {
     setSelectedCategories([]);
@@ -142,7 +186,7 @@ export function HomeContent() {
   };
 
   const filterState = {
-    brands,
+    brands: allBrands,
     selectedBrands,
     setSelectedBrands,
     priceRange,
@@ -243,7 +287,7 @@ export function HomeContent() {
                       </div>
                       <span className="text-xs font-medium">All</span>
                     </button>
-                    {categories.map((category) => {
+                    {allCategories.map((category) => {
                       const Icon = categoryIcons[category] || LayoutGrid;
                       const isSelected = selectedCategories.includes(category);
                       return (
@@ -273,8 +317,8 @@ export function HomeContent() {
 
             <ProductView
               products={filteredProducts}
-              categories={categories}
-              brands={brands}
+              categories={allCategories}
+              brands={allBrands}
               filterState={filterState}
               isClient={isClient}
             />
@@ -282,7 +326,7 @@ export function HomeContent() {
           <TabsContent value="stores">
             <div className="p-4 md:p-6">
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {stores.map((store) => (
+                {allStores.map((store) => (
                   <StoreCard key={store.id} store={store} />
                 ))}
               </div>

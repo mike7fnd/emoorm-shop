@@ -20,7 +20,7 @@ export function OrderItemCard({ item }: OrderItemCardProps) {
         alt={item.product.name}
         width={80}
         height={80}
-        className="rounded-[15px] object-cover aspect-square border"
+        className="rounded-[15px] object-cover aspect-square"
         data-ai-hint={item.product.image.hint}
       />
       <div className="flex-1">

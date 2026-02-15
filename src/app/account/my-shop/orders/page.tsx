@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AccountHeader } from '@/components/layout/account-header';
+import { SellerPageLayout } from '@/components/layout/seller-page-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShoppingCart } from 'lucide-react';
 import { useUser } from '@/supabase/provider';
@@ -41,17 +41,16 @@ export default function OrdersPage() {
   }
 
   return (
-    <>
-      <AccountHeader title="Orders" />
-      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8">
+    <SellerPageLayout title="Orders">
+      <div className="pt-4 md:pt-0">
         <h1 className="text-2xl font-bold mb-8">Your Orders</h1>
 
-        <div className="text-center py-16 bg-muted/30 rounded-[30px] border-2 border-dashed">
+        <div className="text-center py-16 bg-muted/30 rounded-[30px]">
           <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-semibold">No orders yet</h3>
           <p className="text-muted-foreground">Orders from your customers will appear here. Once you have products, customer orders will be listed here.</p>
         </div>
-      </main>
-    </>
+      </div>
+    </SellerPageLayout>
   );
 }

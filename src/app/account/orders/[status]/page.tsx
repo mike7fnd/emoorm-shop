@@ -1,8 +1,8 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { Header } from '@/components/layout/header';
-import { products } from '@/lib/data';
+import { AccountPageLayout } from '@/components/layout/account-page-layout';
+import { products } from '@/lib/data';  // Mock orders use static data for now
 import { OrderCard } from '@/components/account/order-card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
@@ -34,7 +34,7 @@ const mockOrders = [
     total: 1500,
     items: [{ product: products[0], quantity: 1 }],
   },
-   {
+  {
     id: 'ORD-004',
     status: 'to-review',
     date: '2024-07-18',
@@ -60,26 +60,23 @@ export default function OrdersPage() {
   );
 
   return (
-    <>
-      <div className="hidden md:block">
-        <Header showSearch={false} />
-      </div>
-      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8 safe-area-top">
-        <h1 className="text-lg font-semibold mb-4">My Orders</h1>
-        
+    <AccountPageLayout title="My Orders" hideMobileHeader>
+      <div className="pt-4 md:pt-0 safe-area-top md:safe-area-top-0">
+        <h1 className="text-lg font-semibold mb-4 md:text-2xl md:font-bold md:mb-6">My Orders</h1>
+
         <Tabs defaultValue={currentStatus} className="w-full mb-8">
           <div className="border-b">
             <TabsList className="bg-transparent p-0 h-auto gap-8 justify-center w-full">
               {statusTabs.map(tab => (
-                   <Link href={`/account/orders/${tab.value}`} key={tab.value} passHref className={cn(
-                    "flex-shrink-0",
-                    tab.value === 'all' && 'hidden sm:flex'
-                  )}>
-                      <TabsTrigger value={tab.value} className="flex flex-col gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-none -mb-px pt-3 px-1 pb-2">
-                          <tab.icon className="h-5 w-5" />
-                          <span>{tab.label}</span>
-                      </TabsTrigger>
-                  </Link>
+                <Link href={`/account/orders/${tab.value}`} key={tab.value} passHref className={cn(
+                  "flex-shrink-0",
+                  tab.value === 'all' && 'hidden sm:flex'
+                )}>
+                  <TabsTrigger value={tab.value} className="flex flex-col gap-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-none -mb-px pt-3 px-1 pb-2">
+                    <tab.icon className="h-5 w-5" />
+                    <span>{tab.label}</span>
+                  </TabsTrigger>
+                </Link>
               ))}
             </TabsList>
           </div>
@@ -96,7 +93,7 @@ export default function OrdersPage() {
             <p className="text-muted-foreground">You have no orders in this category.</p>
           </div>
         )}
-      </main>
-    </>
+      </div>
+    </AccountPageLayout>
   );
 }

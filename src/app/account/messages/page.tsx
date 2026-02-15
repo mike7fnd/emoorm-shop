@@ -1,6 +1,6 @@
 'use client';
 
-import { AccountHeader } from '@/components/layout/account-header';
+import { AccountPageLayout } from '@/components/layout/account-page-layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, Search } from 'lucide-react';
@@ -17,40 +17,40 @@ const mockMessages = [
 
 export default function MessagesPage() {
   return (
-    <>
-      <AccountHeader title="Messages" />
-      <main className="pb-24 md:pb-8">
-        <div className="container mx-auto px-4 pt-4">
-            <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input placeholder="Search messages..." className="pl-10" />
-            </div>
+    <AccountPageLayout title="Messages">
+      <div className="pt-4 md:pt-0">
+        <h1 className="hidden md:block text-2xl font-bold mb-6">Messages</h1>
+        <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input placeholder="Search messages..." className="pl-10" />
         </div>
 
-        <ul className="divide-y">
-            {mockMessages.map(message => (
-                <li key={message.id}>
-                    <Link href="#" className="block hover:bg-accent transition-colors">
-                        <div className="flex items-start gap-4 p-4 container mx-auto">
-                            <Avatar className="h-12 w-12">
-                                <AvatarImage src={message.avatar} />
-                                <AvatarFallback>
-                                    <User className="h-6 w-6" />
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">{message.name}</p>
-                                    <p className="text-xs text-muted-foreground">{message.timestamp}</p>
-                                </div>
-                                <p className="text-sm text-muted-foreground truncate">{message.message}</p>
-                            </div>
-                        </div>
-                    </Link>
-                </li>
-            ))}
-        </ul>
-      </main>
-    </>
+        <Card className="rounded-[20px] shadow-card-shadow overflow-hidden">
+          <ul className="divide-y">
+              {mockMessages.map(message => (
+                  <li key={message.id}>
+                      <Link href="#" className="block hover:bg-accent transition-colors">
+                          <div className="flex items-start gap-4 p-4">
+                              <Avatar className="h-12 w-12">
+                                  <AvatarImage src={message.avatar} />
+                                  <AvatarFallback>
+                                      <User className="h-6 w-6" />
+                                  </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                  <div className="flex justify-between">
+                                      <p className="font-semibold">{message.name}</p>
+                                      <p className="text-xs text-muted-foreground">{message.timestamp}</p>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground truncate">{message.message}</p>
+                              </div>
+                          </div>
+                      </Link>
+                  </li>
+              ))}
+          </ul>
+        </Card>
+      </div>
+    </AccountPageLayout>
   );
 }

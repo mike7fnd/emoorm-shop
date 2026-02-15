@@ -1,7 +1,7 @@
 
 'use client';
 
-import { AccountHeader } from '@/components/layout/account-header';
+import { AccountPageLayout } from '@/components/layout/account-page-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -11,9 +11,9 @@ import Link from 'next/link';
 
 export default function SettingsPage() {
   return (
-    <>
-      <AccountHeader title="Account Settings" />
-      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8">
+    <AccountPageLayout title="Account Settings">
+      <div className="pt-4 md:pt-0">
+        <h1 className="hidden md:block text-2xl font-bold mb-6">Account Settings</h1>
         <Card>
             <CardContent className="p-0">
                 <ul className="divide-y">
@@ -51,9 +51,9 @@ export default function SettingsPage() {
             </CardContent>
         </Card>
         <div className="mt-8">
-            <Button variant="destructive" className="w-full">Sign Out</Button>
+            <Button variant="destructive" className="w-full md:w-auto">Sign Out</Button>
         </div>
-      </main>
-    </>
+      </div>
+    </AccountPageLayout>
   );
 }

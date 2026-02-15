@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Header } from '@/components/layout/header';
+import { AccountPageLayout } from '@/components/layout/account-page-layout';
 import { Button } from '@/components/ui/button';
 import { Plus, MapPin } from 'lucide-react';
 import { AddressCard } from '@/components/account/address-card';
@@ -47,12 +47,12 @@ export default function AddressPage() {
     setEditingAddress(address);
     setIsFormOpen(true);
   };
-  
+
   const handleSave = (address: any) => {
-    if(address.id) {
-        setAddresses(addresses.map(a => a.id === address.id ? address : a));
+    if (address.id) {
+      setAddresses(addresses.map(a => a.id === address.id ? address : a));
     } else {
-        setAddresses([...addresses, { ...address, id: `${Date.now()}` }]);
+      setAddresses([...addresses, { ...address, id: `${Date.now()}` }]);
     }
     setIsFormOpen(false);
     setEditingAddress(null);
@@ -62,32 +62,29 @@ export default function AddressPage() {
     setIsFormOpen(false);
     setEditingAddress(null);
   };
-  
+
   const handleDelete = (id: string) => {
     setAddresses(addresses.filter(a => a.id !== id));
   };
-  
+
   const handleSetDefault = (id: string) => {
-    setAddresses(addresses.map(a => ({...a, isDefault: a.id === id})));
+    setAddresses(addresses.map(a => ({ ...a, isDefault: a.id === id })));
   };
 
   return (
-    <>
-      <div className="hidden md:block">
-        <Header showSearch={false} />
-      </div>
-      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8 safe-area-top">
+    <AccountPageLayout title="My Addresses">
+      <div className="pt-4 md:pt-0">
         {!isFormOpen ? (
           <>
             <div className="flex justify-between items-center mb-8">
-              <h1 className="text-lg font-semibold">My Addresses</h1>
+              <h1 className="text-lg font-semibold md:text-2xl md:font-bold">My Addresses</h1>
               <Button onClick={handleAddNew}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add New
               </Button>
             </div>
             {addresses.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2">
                 {addresses.map((address) => (
                   <AddressCard
                     key={address.id}
@@ -99,7 +96,7 @@ export default function AddressPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 border-2 border-dashed rounded-lg">
+              <div className="text-center py-16 rounded-lg bg-muted/30">
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-24 h-24 bg-secondary rounded-full">
                     <MapPin className="w-12 h-12 text-muted-foreground" />
@@ -116,17 +113,17 @@ export default function AddressPage() {
           </>
         ) : (
           <div>
-            <h1 className="text-lg font-semibold mb-8">
-                {editingAddress ? 'Edit Address' : 'Add New Address'}
+            <h1 className="text-lg font-semibold mb-8 md:text-2xl md:font-bold">
+              {editingAddress ? 'Edit Address' : 'Add New Address'}
             </h1>
-            <AddressForm 
-                address={editingAddress} 
-                onSave={handleSave} 
-                onCancel={handleCancel}
+            <AddressForm
+              address={editingAddress}
+              onSave={handleSave}
+              onCancel={handleCancel}
             />
           </div>
         )}
-      </main>
-    </>
+      </div>
+    </AccountPageLayout>
   );
 }

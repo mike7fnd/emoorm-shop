@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/use-cart';
-import { products, stores } from '@/lib/data';
+import { useAllProducts, useAllStores } from '@/hooks/use-all-products';
 import { ShoppingBag, X, Plus, Minus, CreditCard, ChevronRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -18,6 +18,8 @@ import { ProductGrid } from '@/components/products/product-grid';
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity } = useCart();
+  const { products } = useAllProducts();
+  const { stores } = useAllStores();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const cartItems = useMemo(() => cart
@@ -45,7 +47,7 @@ export default function CartPage() {
       return acc;
     }, {} as Record<string, typeof cartItems>);
   }, [cartItems]);
-  
+
   const selectedCartItems = useMemo(() => {
     return cartItems.filter(item => selectedItems.includes(item.id));
   }, [cartItems, selectedItems]);
@@ -55,7 +57,7 @@ export default function CartPage() {
   const total = subtotal + shippingFee;
 
   const handleToggleSelectItem = (itemId: string) => {
-    setSelectedItems(prev => 
+    setSelectedItems(prev =>
       prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
     );
   };
@@ -63,7 +65,7 @@ export default function CartPage() {
   const handleToggleSelectShop = (shopItems: typeof cartItems) => {
     const shopItemIds = shopItems.map(item => item.id);
     const allSelected = shopItemIds.every(id => selectedItems.includes(id));
-    
+
     if (allSelected) {
       setSelectedItems(prev => prev.filter(id => !shopItemIds.includes(id)));
     } else {
@@ -88,7 +90,7 @@ export default function CartPage() {
       <div className="hidden md:block">
         <Header showSearch={false} />
       </div>
-      <main className="container mx-auto px-4 pt-4 pb-40 md:pb-8 safe-area-top">
+      <main className="container mx-auto px-4 pt-4 pb-40 md:pb-8">
         <h1 className="text-lg font-semibold mb-8 md:mt-0 text-left">My Cart</h1>
         {cartItems.length > 0 ? (
           <div className="grid md:grid-cols-3 gap-8 md:gap-12 items-start">
@@ -101,27 +103,27 @@ export default function CartPage() {
 
                 return (
                   <div key={shopName}>
-                     <div className="flex items-center gap-3 mb-3">
-                        <Checkbox 
-                           id={`select-shop-${shopName}`}
-                           checked={allSelected ? true : someSelected ? 'indeterminate' : false}
-                           onCheckedChange={() => handleToggleSelectShop(items)}
-                        />
-                         <Link href={store ? `/stores/${store.id}` : '#'} className="flex items-center gap-2 group">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage src={store?.image.src} />
-                              <AvatarFallback>{shopName.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <span className="font-normal group-hover:underline text-sm">{shopName}</span>
-                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                         </Link>
-                     </div>
+                    <div className="flex items-center gap-3 mb-3">
+                      <Checkbox
+                        id={`select-shop-${shopName}`}
+                        checked={allSelected ? true : someSelected ? 'indeterminate' : false}
+                        onCheckedChange={() => handleToggleSelectShop(items)}
+                      />
+                      <Link href={store ? `/stores/${store.id}` : '#'} className="flex items-center gap-2 group">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={store?.image.src} />
+                          <AvatarFallback>{shopName.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <span className="font-normal group-hover:underline text-sm">{shopName}</span>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </Link>
+                    </div>
                     <Card className="rounded-[25px] shadow-card-shadow">
                       <CardContent className="p-0">
                         <div className="divide-y divide-border">
                           {items.map((item) => (
                             <div key={item.id} className="flex items-start gap-4 p-4">
-                              <Checkbox 
+                              <Checkbox
                                 id={`select-item-${item.id}`}
                                 className="mt-8"
                                 checked={selectedItems.includes(item.id)}
@@ -141,11 +143,11 @@ export default function CartPage() {
                                 </Link>
                                 <p className="text-muted-foreground text-sm">₱{item.price.toFixed(2)}</p>
                                 {item.stock < 10 && (
-                                    <p className="text-sm text-destructive font-medium">
-                                        Only {item.stock} left!
-                                    </p>
+                                  <p className="text-sm text-destructive font-medium">
+                                    Only {item.stock} left!
+                                  </p>
                                 )}
-                                 <div className="flex items-center gap-2 mt-2">
+                                <div className="flex items-center gap-2 mt-2">
                                   <Button
                                     variant="outline"
                                     size="icon"
@@ -197,7 +199,7 @@ export default function CartPage() {
                 );
               })}
             </div>
-            
+
             <div className="hidden md:block md:col-span-1">
               <Card className="sticky top-20 shadow-card-shadow">
                 <CardContent className="p-6 space-y-4">
@@ -215,7 +217,7 @@ export default function CartPage() {
                     <span>Total</span>
                     <span>₱{total.toFixed(2)}</span>
                   </div>
-                   <Button size="lg" className="w-full rounded-[30px]" asChild disabled={selectedCartItems.length === 0}>
+                  <Button size="lg" className="w-full rounded-[30px]" asChild disabled={selectedCartItems.length === 0}>
                     <Link href="/checkout">
                       <CreditCard className="mr-2 h-5 w-5" />
                       Proceed to Checkout
@@ -228,9 +230,9 @@ export default function CartPage() {
         ) : (
           <div className="text-center py-16">
             <div className="flex justify-center mb-4">
-                <div className="flex items-center justify-center w-24 h-24 bg-secondary rounded-full">
-                    <ShoppingBag className="w-12 h-12 text-muted-foreground" />
-                </div>
+              <div className="flex items-center justify-center w-24 h-24 bg-secondary rounded-full">
+                <ShoppingBag className="w-12 h-12 text-muted-foreground" />
+              </div>
             </div>
             <h2 className="text-2xl font-semibold mb-2">Your cart is empty</h2>
             <p className="text-muted-foreground mb-8">Looks like you haven’t added any items to your cart yet.</p>
@@ -249,8 +251,8 @@ export default function CartPage() {
         )}
       </main>
 
-       {cartItems.length > 0 && (
-        <div className="md:hidden fixed bottom-16 left-0 right-0 bg-background border-t p-4 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] safe-area-inset-x">
+      {cartItems.length > 0 && (
+        <div className="md:hidden fixed bottom-16 left-0 right-0 bg-background border-t p-4 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
           <div className="flex justify-between items-center mb-4">
             <span className="text-lg font-bold">Total ({selectedCartItems.length}):</span>
             <span className="text-xl font-bold">₱{total.toFixed(2)}</span>

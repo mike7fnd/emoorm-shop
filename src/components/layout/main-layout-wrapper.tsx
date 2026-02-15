@@ -13,13 +13,13 @@ export function MainLayoutWrapper({ children }: { children: ReactNode }) {
   // Show nav if the current path is one of the exact main paths,
   // or if it's the account page or one of its sub-pages.
   const showNav = mainNavPaths.includes(pathname) || pathname.startsWith('/account');
-  
+
   // Check if on seller path for shop nav
   const isSellerPath = pathname.startsWith('/account/my-shop');
 
   return (
     <>
-      <div className={showNav ? isSellerPath ? "flex-1 pb-32 md:pb-0 safe-area-inset-x" : "flex-1 pb-32 md:pb-0 safe-area-inset-x" : "flex-1 safe-area-inset-x"}>{children}</div>
+      <div className={showNav ? isSellerPath ? "flex-1 pb-32 md:pb-0" : "flex-1 pb-32 md:pb-0" : "flex-1"}>{children}</div>
       {showNav && <MobileNav />}
     </>
   );

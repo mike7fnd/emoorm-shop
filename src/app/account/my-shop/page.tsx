@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { AccountHeader } from '@/components/layout/account-header';
+import { SellerPageLayout } from '@/components/layout/seller-page-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Package, ShoppingCart, TrendingUp, Settings, MessageSquare, ExternalLink } from 'lucide-react';
@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUser } from '@/supabase/provider';
 import { sellerService, SellerProfile } from '@/supabase/services/seller';
+import { productService } from '@/supabase/services/products';
 
 export default function SellerDashboardPage() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function SellerDashboardPage() {
   const [sellerProfile, setSellerProfile] = useState<SellerProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [productCount, setProductCount] = useState(0);
 
   useEffect(() => {
     const loadSellerProfile = async () => {
@@ -29,6 +31,10 @@ export default function SellerDashboardPage() {
       try {
         const profile = await sellerService.getSellerProfile(user.id);
         setSellerProfile(profile);
+        if (profile) {
+          const products = await productService.getAllProductsBySeller(profile.id);
+          setProductCount(products.length);
+        }
       } catch (err) {
         console.error('Failed to load seller profile:', err);
         setError('Failed to load seller profile');
@@ -67,18 +73,18 @@ export default function SellerDashboardPage() {
   const stats = [
     { label: 'Total Sales', value: '₱0.00', icon: TrendingUp },
     { label: 'Orders', value: '0', icon: ShoppingCart },
-    { label: 'Products', value: '0', icon: Package },
+    { label: 'Products', value: productCount.toString(), icon: Package },
     { label: 'Chat', value: '0', icon: MessageSquare },
   ];
 
   const shopInitial = sellerProfile.shop_name?.charAt(0).toUpperCase() || 'S';
 
   return (
-    <>
-      <AccountHeader title="Seller Dashboard" />
-      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8">
+    <SellerPageLayout title="Seller Dashboard">
+      <div className="pt-4 md:pt-0">
+        {/* Shop header - visible on mobile, hidden on desktop (sidebar has it) */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 md:hidden">
             <Avatar className="h-16 w-16 border-2 border-primary">
               <AvatarImage src={sellerProfile.shop_logo} alt={sellerProfile.shop_name} />
               <AvatarFallback>{shopInitial}</AvatarFallback>
@@ -90,7 +96,13 @@ export default function SellerDashboardPage() {
               </p>
             </div>
           </div>
+          <h1 className="hidden md:block text-2xl font-bold">Dashboard</h1>
           <div className="flex gap-2 flex-col sm:flex-row">
+            <Button variant="outline" size="sm" asChild className="rounded-full">
+              <Link href={`/stores/${sellerProfile.id}`}>
+                <ExternalLink className="mr-2 h-4 w-4" /> View Store
+              </Link>
+            </Button>
             <Button variant="outline" size="sm" asChild className="rounded-full">
               <Link href={`/account/my-shop/settings`}>
                 <Settings className="mr-2 h-4 w-4" /> Settings
@@ -104,9 +116,9 @@ export default function SellerDashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 md:hidden">
           {stats.map((stat, i) => (
-            <Card key={i} className="rounded-2xl border-none shadow-card-shadow">
+            <Card key={i} className="rounded-2xl shadow-card-shadow">
               <CardContent className="p-4 flex flex-col items-center justify-center text-center">
                 <stat.icon className="h-5 w-5 text-primary mb-2" />
                 <p className="text-lg font-bold">{stat.value}</p>
@@ -117,7 +129,7 @@ export default function SellerDashboardPage() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-4">
-          <Card className="rounded-[30px] shadow-card-shadow border-none cursor-pointer hover:shadow-lg transition-shadow" asChild>
+          <Card className="rounded-[30px] shadow-card-shadow cursor-pointer hover:shadow-lg transition-shadow" asChild>
             <Link href="/account/my-shop/products">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -127,12 +139,12 @@ export default function SellerDashboardPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">Manage your product listings</p>
-                <p className="text-2xl font-bold mt-2">0</p>
+                <p className="text-2xl font-bold mt-2">{productCount}</p>
               </CardContent>
             </Link>
           </Card>
 
-          <Card className="rounded-[30px] shadow-card-shadow border-none cursor-pointer hover:shadow-lg transition-shadow" asChild>
+          <Card className="rounded-[30px] shadow-card-shadow cursor-pointer hover:shadow-lg transition-shadow" asChild>
             <Link href="/account/my-shop/orders">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -147,7 +159,7 @@ export default function SellerDashboardPage() {
             </Link>
           </Card>
 
-          <Card className="rounded-[30px] shadow-card-shadow border-none cursor-pointer hover:shadow-lg transition-shadow" asChild>
+          <Card className="rounded-[30px] shadow-card-shadow cursor-pointer hover:shadow-lg transition-shadow" asChild>
             <Link href="/account/my-shop/messages">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -163,7 +175,7 @@ export default function SellerDashboardPage() {
           </Card>
         </div>
 
-        <Card className="rounded-[30px] shadow-card-shadow border-none mt-8">
+        <Card className="rounded-[30px] shadow-card-shadow mt-8">
           <CardHeader>
             <CardTitle>Shop Details</CardTitle>
           </CardHeader>
@@ -184,7 +196,7 @@ export default function SellerDashboardPage() {
             </div>
           </CardContent>
         </Card>
-      </main>
-    </>
+      </div>
+    </SellerPageLayout>
   );
 }

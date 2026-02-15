@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,6 +13,7 @@ import Image from 'next/image';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { useUser, useAuth } from '@/supabase/provider';
 import { auth } from '@/supabase/auth';
+import { AccountPageLayout } from '@/components/layout/account-page-layout';
 
 const orderStatuses = [
   { name: 'To Pay', icon: Wallet, href: '/account/orders/to-pay', count: 1 },
@@ -62,8 +62,17 @@ function LoginForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void }) {
   };
 
   return (
-    <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow">
-      <CardHeader className="text-center">
+    <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow bg-background/95 backdrop-blur-md">
+      <CardHeader className="text-center space-y-3">
+        <div className="flex justify-center">
+          <Image
+            src="https://image2url.com/r2/default/images/1769822813493-b3b30748-4fdb-4a02-b16a-f2d85a882941.png"
+            alt="E-Moorm Logo"
+            width={80}
+            height={80}
+            className="h-20 w-20 object-contain"
+          />
+        </div>
         <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
         <p className="text-muted-foreground text-sm">Login to your account</p>
       </CardHeader>
@@ -162,8 +171,17 @@ function SignUpForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
 
   if (success) {
     return (
-      <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow">
-        <CardHeader className="text-center">
+      <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow bg-background/95 backdrop-blur-md">
+        <CardHeader className="text-center space-y-3">
+          <div className="flex justify-center">
+            <Image
+              src="https://image2url.com/r2/default/images/1769822813493-b3b30748-4fdb-4a02-b16a-f2d85a882941.png"
+              alt="E-Moorm Logo"
+              width={80}
+              height={80}
+              className="h-20 w-20 object-contain"
+            />
+          </div>
           <CardTitle className="text-2xl font-bold">Check Your Email</CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
@@ -180,8 +198,17 @@ function SignUpForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
   }
 
   return (
-    <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow">
-      <CardHeader className="text-center">
+    <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow bg-background/95 backdrop-blur-md">
+      <CardHeader className="text-center space-y-3">
+        <div className="flex justify-center">
+          <Image
+            src="https://image2url.com/r2/default/images/1769822813493-b3b30748-4fdb-4a02-b16a-f2d85a882941.png"
+            alt="E-Moorm Logo"
+            width={80}
+            height={80}
+            className="h-20 w-20 object-contain"
+          />
+        </div>
         <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
         <p className="text-muted-foreground text-sm">Sign up for a new account</p>
       </CardHeader>
@@ -343,37 +370,37 @@ export default function AccountPage() {
   // Show loading state while checking auth
   if (isUserLoading) {
     return (
-      <>
-        <div className="hidden md:block">
-          <Header showSearch={false} />
-        </div>
-        <main className="pb-24 md:pb-8 flex items-center justify-center min-h-[50vh] safe-area-top">
+      <AccountPageLayout title="My Account" hideMobileHeader>
+        <div className="flex items-center justify-center min-h-[50vh]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
-      </>
+        </div>
+      </AccountPageLayout>
     );
   }
 
-  // Show login/signup form if not logged in
+  // Show login/signup form if not logged in — full-screen, no nav
   if (!user) {
     return (
-      <>
-        <div className="hidden md:block">
-          <Header showSearch={false} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        {/* Fullscreen background image */}
+        <Image
+          src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1920&auto=format&fit=crop"
+          alt="Background"
+          fill
+          className="object-cover"
+          priority
+        />
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-black/40" />
+        {/* Login / Signup card */}
+        <div className="relative z-10 w-full px-4">
+          {showLoginForm ? (
+            <LoginForm onSwitchToSignUp={() => setShowLoginForm(false)} />
+          ) : (
+            <SignUpForm onSwitchToLogin={() => setShowLoginForm(true)} />
+          )}
         </div>
-        <main className="pb-24 md:pb-8">
-          <div className="md:hidden h-16 flex items-center justify-between px-4 safe-area-top">
-            <h1 className="text-lg font-semibold">My Account</h1>
-          </div>
-          <div className="container mx-auto px-4 pt-0 md:pt-8 relative">
-            {showLoginForm ? (
-              <LoginForm onSwitchToSignUp={() => setShowLoginForm(false)} />
-            ) : (
-              <SignUpForm onSwitchToLogin={() => setShowLoginForm(true)} />
-            )}
-          </div>
-        </main>
-      </>
+      </div>
     );
   }
 
@@ -383,159 +410,216 @@ export default function AccountPage() {
   const userAvatar = user.user_metadata?.avatar_url || avatarSrc;
 
   return (
-    <>
-      <div className="hidden md:block">
-        <Header showSearch={false} />
-      </div>
-      <main className="pb-24 md:pb-8">
-         <div className="md:hidden h-16 flex items-center justify-between px-4 safe-area-top">
-            <h1 className="text-lg font-semibold">My Account</h1>
-            <div className="flex items-center">
-                <Button variant="ghost" size="icon" asChild>
-                    <Link href="/account/messages">
-                        <MessageSquare className="h-5 w-5" />
-                    </Link>
+    <AccountPageLayout title="My Account" hideMobileHeader>
+      {/* ===== MOBILE LAYOUT (untouched) ===== */}
+      <div className="md:hidden">
+        {/* Mobile header with action buttons */}
+        <div className="h-16 flex items-center justify-between px-4 -mx-4">
+          <h1 className="text-lg font-semibold">My Account</h1>
+          <div className="flex items-center">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/account/messages">
+                <MessageSquare className="h-5 w-5" />
+              </Link>
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Bell className="h-5 w-5" />
                 </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                        <Bell className="h-5 w-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-80 rounded-[15px]">
-                    <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <div className="p-1">
-                        {mockNotifications.map((notif, index) => (
-                           <DropdownMenuItem key={index} className="flex items-start gap-3 rounded-md">
-                                <notif.icon className="h-4 w-4 mt-1 text-primary" />
-                                <div className="flex-1">
-                                    <p className="font-semibold text-sm">{notif.title}</p>
-                                    <p className="text-xs text-muted-foreground">{notif.description}</p>
-                                </div>
-                                <p className="text-xs text-muted-foreground">{notif.time}</p>
-                           </DropdownMenuItem>
-                        ))}
-                    </div>
-                    <DropdownMenuSeparator />
-                     <div className="p-1">
-                        <DropdownMenuItem asChild className="justify-center rounded-md">
-                           <Link href="/account/notifications">
-                             See All Notifications
-                           </Link>
-                        </DropdownMenuItem>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-5 w-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 rounded-[15px]">
-                     {menuOptions.map((option) => (
-                        <DropdownMenuItem key={option.label} asChild className="rounded-md">
-                            <Link href={option.href}>
-                                <option.icon className="mr-2 h-4 w-4" />
-                                <span>{option.label}</span>
-                            </Link>
-                        </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      className="text-destructive focus:text-destructive rounded-md cursor-pointer"
-                      onClick={handleSignOut}
-                    >
-                        <LogOut className="mr-2 h-4 w-4" />
-                        <span>Sign Out</span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80 rounded-[15px]">
+                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <div className="p-1">
+                  {mockNotifications.map((notif, index) => (
+                    <DropdownMenuItem key={index} className="flex items-start gap-3 rounded-md">
+                      <notif.icon className="h-4 w-4 mt-1 text-primary" />
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm">{notif.title}</p>
+                        <p className="text-xs text-muted-foreground">{notif.description}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{notif.time}</p>
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
+                  ))}
+                </div>
+                <DropdownMenuSeparator />
+                <div className="p-1">
+                  <DropdownMenuItem asChild className="justify-center rounded-md">
+                    <Link href="/account/notifications">See All Notifications</Link>
+                  </DropdownMenuItem>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 rounded-[15px]">
+                {menuOptions.map((option) => (
+                  <DropdownMenuItem key={option.label} asChild className="rounded-md">
+                    <Link href={option.href}>
+                      <option.icon className="mr-2 h-4 w-4" />
+                      <span>{option.label}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive rounded-md cursor-pointer"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
-        <div className="container mx-auto px-4 pt-0 md:pt-8 relative">
-            <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow">
-                <CardContent className="pt-6">
-                    <div className="flex flex-col items-center text-center">
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            className="hidden"
-                            accept="image/*"
-                        />
-                        <button onClick={handleAvatarClick} className="relative group">
-                            <Avatar className="h-24 w-24 mb-4 border-4 border-background shadow-lg">
-                                <AvatarImage src={userAvatar} data-ai-hint="portrait" />
-                                <AvatarFallback>
-                                    <User className="h-10 w-10" />
-                                </AvatarFallback>
-                            </Avatar>
-                        </button>
-                        <h1 className="text-2xl font-bold">{userName}</h1>
-                        <p className="text-muted-foreground">{userEmail}</p>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow mt-4">
-                <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <CardTitle className="text-lg">My Orders</CardTitle>
-                        <Link href="/account/orders/all" className="text-sm text-primary hover:underline">
-                            View All
-                        </Link>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                     <div className="flex justify-around w-full">
-                        {orderStatuses.map((status) => (
-                          <Link href={status.href} key={status.name} className="flex flex-col items-center gap-1 text-foreground hover:text-primary transition-colors">
-                            <div className="relative">
-                                <status.icon className="h-7 w-7" strokeWidth={1.5} />
-                                {status.count > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                                        {status.count}
-                                    </span>
-                                )}
-                            </div>
-                            <span className="text-xs font-medium text-muted-foreground">{status.name}</span>
-                          </Link>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
-
-            <div className="max-w-md mx-auto grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
-                <Link href={hasShop ? "/account/my-shop" : "/account/seller-registration"}>
-                    <Card className="hover:bg-accent transition-colors h-full shadow-card-shadow">
-                        <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
-                           <Image src="https://lftz25oez4aqbxpq.public.blob.vercel-storage.com/image-kgYMsaYJpFuQ4XMNy0GYQ2zmrWOuJz.png" alt="Be a Seller" width={100} height={100} />
-                           <p className="font-semibold text-sm mt-2">{hasShop ? 'My Shop' : 'Be a Seller'}</p>
-                        </CardContent>
-                    </Card>
-                </Link>
-                 <Link href="/account/vouchers">
-                    <Card className="hover:bg-accent transition-colors h-full shadow-card-shadow">
-                        <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
-                           <Image src="https://lftz25oez4aqbxpq.public.blob.vercel-storage.com/image-xPBxqYxnSi0VmK3ALnqKVxdTMKcII9.png" alt="My Vouchers" width={100} height={100} />
-                           <p className="font-semibold text-sm mt-2">My Vouchers</p>
-                        </CardContent>
-                    </Card>
-                </Link>
-                 <Link href="/account/help">
-                    <Card className="hover:bg-accent transition-colors h-full shadow-card-shadow">
-                        <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
-                           <Image src="https://lftz25oez4aqbxpq.public.blob.vercel-storage.com/image-m3g6C1b2A0S8R9p2W6n4Q5Y7vX8Z2k.png" alt="Help Center" width={100} height={100} />
-                           <p className="font-semibold text-sm mt-2">Help Center</p>
-                        </CardContent>
-                    </Card>
-                </Link>
+        {/* Mobile Profile card */}
+        <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center text-center">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*"
+              />
+              <button onClick={handleAvatarClick} className="relative group">
+                <Avatar className="h-24 w-24 mb-4 border-4 border-background shadow-lg">
+                  <AvatarImage src={userAvatar} data-ai-hint="portrait" />
+                  <AvatarFallback>
+                    <User className="h-10 w-10" />
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+              <h2 className="text-2xl font-bold">{userName}</h2>
+              <p className="text-muted-foreground">{userEmail}</p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Mobile Orders card */}
+        <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow mt-4">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-lg">My Orders</CardTitle>
+              <Link href="/account/orders/all" className="text-sm text-primary hover:underline">
+                View All
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-around w-full">
+              {orderStatuses.map((status) => (
+                <Link href={status.href} key={status.name} className="flex flex-col items-center gap-1 text-foreground hover:text-primary transition-colors">
+                  <div className="relative">
+                    <status.icon className="h-7 w-7" strokeWidth={1.5} />
+                    {status.count > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                        {status.count}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs font-medium text-muted-foreground">{status.name}</span>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Mobile Quick links grid */}
+        <div className="max-w-md mx-auto grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+          <Link href={hasShop ? "/account/my-shop" : "/account/seller-registration"}>
+            <Card className="hover:bg-accent transition-colors h-full shadow-card-shadow">
+              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
+                <Image src="https://lftz25oez4aqbxpq.public.blob.vercel-storage.com/image-kgYMsaYJpFuQ4XMNy0GYQ2zmrWOuJz.png" alt="Be a Seller" width={100} height={100} />
+                <p className="font-semibold text-sm mt-2">{hasShop ? 'My Shop' : 'Be a Seller'}</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/account/vouchers">
+            <Card className="hover:bg-accent transition-colors h-full shadow-card-shadow">
+              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
+                <Image src="https://lftz25oez4aqbxpq.public.blob.vercel-storage.com/image-xPBxqYxnSi0VmK3ALnqKVxdTMKcII9.png" alt="My Vouchers" width={100} height={100} />
+                <p className="font-semibold text-sm mt-2">My Vouchers</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/account/help">
+            <Card className="hover:bg-accent transition-colors h-full shadow-card-shadow">
+              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
+                <Image src="https://lftz25oez4aqbxpq.public.blob.vercel-storage.com/image-m3g6C1b2A0S8R9p2W6n4Q5Y7vX8Z2k.png" alt="Help Center" width={100} height={100} />
+                <p className="font-semibold text-sm mt-2">Help Center</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
-      </main>
-    </>
+      </div>
+
+      {/* ===== DESKTOP LAYOUT ===== */}
+      <div className="hidden md:block space-y-6">
+        {/* Profile Card */}
+        <Card className="rounded-[30px] shadow-card-shadow">
+          <CardContent className="px-4 py-8">
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*"
+              />
+              <button onClick={handleAvatarClick} className="relative group shrink-0">
+                <Avatar className="h-20 w-20 border-4 border-background shadow-lg">
+                  <AvatarImage src={userAvatar} data-ai-hint="portrait" />
+                  <AvatarFallback>
+                    <User className="h-8 w-8" />
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-2xl font-bold truncate">{userName}</h1>
+                <p className="text-muted-foreground truncate">{userEmail}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Orders Card */}
+        <Card className="rounded-[30px] shadow-card-shadow">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-lg">My Orders</CardTitle>
+              <Link href="/account/orders/all" className="text-sm text-primary hover:underline">
+                View All
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-around w-full">
+              {orderStatuses.map((status) => (
+                <Link href={status.href} key={status.name} className="flex flex-col items-center gap-2 text-foreground hover:text-primary transition-colors group">
+                  <div className="relative h-12 w-12 flex items-center justify-center rounded-xl bg-muted/50 group-hover:bg-primary/10 transition-colors">
+                    <status.icon className="h-6 w-6" strokeWidth={1.5} />
+                    {status.count > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                        {status.count}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">{status.name}</span>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </AccountPageLayout>
   );
 }

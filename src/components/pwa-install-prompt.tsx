@@ -74,7 +74,7 @@ export function PWAInstallPrompt() {
   if (isStandalone || !showBanner) return null;
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 z-50 animate-in slide-in-from-bottom-4 duration-300 md:left-auto md:right-6 md:max-w-sm safe-area-inset-x" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+    <div className="fixed bottom-20 left-4 right-4 z-50 animate-in slide-in-from-bottom-4 duration-300 md:left-auto md:right-6 md:max-w-sm">
       <div className="relative rounded-2xl bg-black p-4 text-white shadow-2xl">
         <button
           onClick={handleDismiss}

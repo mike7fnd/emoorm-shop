@@ -50,7 +50,7 @@ export function MoormyBot() {
   return (
     <div className="fixed bottom-20 right-4 z-50 md:bottom-8 md:right-8">
       {isOpen ? (
-        <Card className="w-80 h-[450px] flex flex-col shadow-card-shadow rounded-[30px] border-primary/20 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <Card className="w-80 h-[450px] flex flex-col shadow-card-shadow rounded-[30px] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
           <CardHeader className="bg-primary text-primary-foreground p-4 flex flex-row items-center justify-between space-y-0">
             <div className="flex items-center gap-2">
               <Bot className="h-5 w-5" />

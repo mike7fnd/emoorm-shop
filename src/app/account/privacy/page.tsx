@@ -1,12 +1,11 @@
 'use client';
 
-import { AccountHeader } from '@/components/layout/account-header';
+import { AccountPageLayout } from '@/components/layout/account-page-layout';
 
 export default function PrivacyPage() {
   return (
-    <>
-      <AccountHeader title="Privacy Policy" />
-      <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8">
+    <AccountPageLayout title="Privacy Policy">
+      <div className="pt-4 md:pt-0">
         <div className="prose max-w-none">
             <h1 className="text-2xl font-bold mb-4">Privacy Policy</h1>
             <p>Last updated: July 25, 2024</p>
@@ -29,7 +28,7 @@ export default function PrivacyPage() {
              <h2 className="text-xl font-semibold mt-6 mb-2">4. Contact Us</h2>
             <p>If you have any questions about this Privacy Policy, please contact us at support@e-moorm.com.</p>
         </div>
-      </main>
-    </>
+      </div>
+    </AccountPageLayout>
   );
 }

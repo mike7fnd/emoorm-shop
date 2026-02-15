@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { CheckoutHeader } from '@/components/layout/checkout-header';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/use-cart';
-import { products } from '@/lib/data';
+import { useAllProducts } from '@/hooks/use-all-products';
 import { CreditCard, Truck, ShieldCheck, Banknote, MapPin, ChevronRight, Home, Plus } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,6 +29,7 @@ const mockAddress = {
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
+  const { products } = useAllProducts();
   const { toast } = useToast();
   const [shippingAddress, setShippingAddress] = useState(mockAddress);
 
@@ -79,7 +80,7 @@ export default function CheckoutPage() {
               <CardContent>
                 {shippingAddress ? (
                   <Link href="/account/address">
-                    <div className="flex items-center p-4 border rounded-[15px] hover:bg-accent cursor-pointer transition-colors">
+                    <div className="flex items-center p-4 rounded-[15px] hover:bg-accent cursor-pointer transition-colors">
                       <MapPin className="h-8 w-8 text-primary mr-4" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -99,10 +100,10 @@ export default function CheckoutPage() {
                   </Link>
                 ) : (
                   <Link href="/account/address">
-                     <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-[15px] hover:bg-accent cursor-pointer transition-colors">
-                        <Plus className="h-8 w-8 text-muted-foreground mb-2" />
-                        <p className="font-semibold text-primary">Add a new address</p>
-                        <p className="text-sm text-muted-foreground">You have no saved addresses.</p>
+                    <div className="flex flex-col items-center justify-center p-8 rounded-[15px] hover:bg-accent cursor-pointer transition-colors">
+                      <Plus className="h-8 w-8 text-muted-foreground mb-2" />
+                      <p className="font-semibold text-primary">Add a new address</p>
+                      <p className="text-sm text-muted-foreground">You have no saved addresses.</p>
                     </div>
                   </Link>
                 )}
@@ -119,7 +120,7 @@ export default function CheckoutPage() {
               <CardContent>
                 <RadioGroup defaultValue="card">
                   <Label htmlFor="card">
-                    <div className="flex items-center space-x-2 p-4 border rounded-md cursor-pointer has-[:checked]:bg-accent has-[:checked]:border-primary">
+                    <div className="flex items-center space-x-2 p-4 rounded-md cursor-pointer has-[:checked]:bg-accent">
                       <RadioGroupItem value="card" id="card" />
                       <div className="flex items-center gap-3">
                         <ShieldCheck className="h-5 w-5 text-primary" />
@@ -127,12 +128,12 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   </Label>
-                   <Label htmlFor="cod" className="mt-4 block">
-                    <div className="flex items-center space-x-2 p-4 border rounded-md cursor-pointer has-[:checked]:bg-accent has-[:checked]:border-primary">
+                  <Label htmlFor="cod" className="mt-4 block">
+                    <div className="flex items-center space-x-2 p-4 rounded-md cursor-pointer has-[:checked]:bg-accent">
                       <RadioGroupItem value="cod" id="cod" />
                       <div className="flex items-center gap-3">
-                          <Banknote className="h-5 w-5 text-primary" />
-                          <span>Cash on Delivery</span>
+                        <Banknote className="h-5 w-5 text-primary" />
+                        <span>Cash on Delivery</span>
                       </div>
                     </div>
                   </Label>
@@ -140,37 +141,37 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
           </div>
-          
+
           <div className="md:col-span-2">
             <Card className="sticky top-20 shadow-card-shadow">
               <CardHeader>
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                 <div className="max-h-60 overflow-y-auto space-y-4 pr-2">
-                    {cartItems.map((item) => (
-                      <div key={item.id} className="flex items-center gap-4">
-                        <div className="relative">
-                           <Image
-                            src={item.image.src}
-                            alt={item.name}
-                            width={64}
-                            height={64}
-                            className="rounded-[15px] object-cover aspect-square"
-                            data-ai-hint={item.image.hint}
-                          />
-                          <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                            {item.quantity}
-                          </span>
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-sm truncate">{item.name}</p>
-                          <p className="text-muted-foreground text-xs">{item.brand}</p>
-                        </div>
-                        <p className="font-semibold text-sm">₱{(item.price * item.quantity).toFixed(2)}</p>
+                <div className="max-h-60 overflow-y-auto space-y-4 pr-2">
+                  {cartItems.map((item) => (
+                    <div key={item.id} className="flex items-center gap-4">
+                      <div className="relative">
+                        <Image
+                          src={item.image.src}
+                          alt={item.name}
+                          width={64}
+                          height={64}
+                          className="rounded-[15px] object-cover aspect-square"
+                          data-ai-hint={item.image.hint}
+                        />
+                        <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                          {item.quantity}
+                        </span>
                       </div>
-                    ))}
-                 </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm truncate">{item.name}</p>
+                        <p className="text-muted-foreground text-xs">{item.brand}</p>
+                      </div>
+                      <p className="font-semibold text-sm">₱{(item.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                  ))}
+                </div>
                 <Separator />
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
@@ -188,9 +189,9 @@ export default function CheckoutPage() {
                 <Button size="lg" className="w-full rounded-[30px]" onClick={handlePlaceOrder}>
                   Place Order
                 </Button>
-                 <p className="text-xs text-muted-foreground text-center">
-                    By placing your order, you agree to our <Link href="#" className="underline">Terms of Service</Link> and <Link href="#" className="underline">Privacy Policy</Link>.
-                 </p>
+                <p className="text-xs text-muted-foreground text-center">
+                  By placing your order, you agree to our <Link href="#" className="underline">Terms of Service</Link> and <Link href="#" className="underline">Privacy Policy</Link>.
+                </p>
               </CardContent>
             </Card>
           </div>
