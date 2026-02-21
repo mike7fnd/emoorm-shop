@@ -564,10 +564,14 @@ export default function AccountPage() {
 
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden md:block space-y-6">
-        {/* Profile Card */}
-        <Card className="rounded-[30px]">
-          <CardContent className="px-4 py-8">
-            <div className="flex items-center gap-4">
+        {/* Profile Banner Card */}
+        <Card className="rounded-2xl overflow-hidden border-0 shadow-sm">
+          {/* Cover gradient */}
+          <div className="h-32 bg-gradient-to-br from-primary/80 via-primary/60 to-primary/40 relative">
+            <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/3965545/pexels-photo-3965545.jpeg?auto=compress&cs=tinysrgb&w=800')] bg-cover bg-center opacity-20" />
+          </div>
+          <CardContent className="relative px-6 pb-6">
+            <div className="flex items-end gap-5 -mt-12">
               <input
                 type="file"
                 ref={fileInputRef}
@@ -576,45 +580,133 @@ export default function AccountPage() {
                 accept="image/*"
               />
               <button onClick={handleAvatarClick} className="relative group shrink-0">
-                <Avatar className="h-20 w-20 border-4 border-background shadow-lg">
+                <Avatar className="h-24 w-24 border-4 border-background shadow-lg ring-2 ring-primary/20">
                   <AvatarImage src={userAvatar} data-ai-hint="portrait" />
                   <AvatarFallback>
-                    <User className="h-8 w-8" />
+                    <User className="h-10 w-10" />
                   </AvatarFallback>
                 </Avatar>
+                <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                  <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">Edit</span>
+                </div>
               </button>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 pb-1">
                 <h1 className="text-2xl font-bold truncate">{userName}</h1>
-                <p className="text-muted-foreground truncate">{userEmail}</p>
+                <p className="text-muted-foreground text-sm truncate">{userEmail}</p>
               </div>
+              <Link href="/account/settings">
+                <Button variant="outline" size="sm" className="rounded-full gap-2 shadow-sm">
+                  <Settings className="h-4 w-4" />
+                  Edit Profile
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
 
         {/* Orders Card */}
-        <Card className="rounded-[30px]">
-          <CardHeader>
+        <Card className="rounded-2xl border-0 shadow-sm">
+          <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-lg">My Orders</CardTitle>
-              <Link href="/account/orders/all" className="text-sm text-primary hover:underline">
+              <CardTitle className="text-lg font-semibold">My Orders</CardTitle>
+              <Link href="/account/orders/all" className="text-sm text-primary hover:underline font-medium">
+                View All Orders
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-4 gap-4">
+              {orderStatuses.map((status) => (
+                <Link href={status.href} key={status.name} className="group">
+                  <div className="flex flex-col items-center gap-2.5 p-4 rounded-xl border border-transparent hover:border-primary/20 hover:bg-primary/5 transition-all">
+                    <div className="relative h-12 w-12 flex items-center justify-center rounded-full bg-muted/60 group-hover:bg-primary/10 transition-colors">
+                      <status.icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.8} />
+                      {status.count > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[11px] w-5 h-5 rounded-full flex items-center justify-center font-bold shadow-sm">
+                          {status.count}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">{status.name}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions Grid */}
+        <div>
+          <h2 className="text-lg font-semibold mb-3 px-1">Quick Actions</h2>
+          <div className="grid grid-cols-3 gap-4">
+            <Link href={hasShop ? "/account/my-shop" : "/account/seller-registration"}>
+              <Card className="rounded-2xl border-0 shadow-sm hover:shadow-md transition-all group cursor-pointer h-full">
+                <CardContent className="p-5 flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-xl bg-orange-50 flex items-center justify-center shrink-0 group-hover:bg-orange-100 transition-colors">
+                    <Store className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm">{hasShop ? 'My Shop' : 'Be a Seller'}</p>
+                    <p className="text-xs text-muted-foreground">{hasShop ? 'Manage your store' : 'Start selling today'}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link href="/account/vouchers">
+              <Card className="rounded-2xl border-0 shadow-sm hover:shadow-md transition-all group cursor-pointer h-full">
+                <CardContent className="p-5 flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 group-hover:bg-purple-100 transition-colors">
+                    <Ticket className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm">My Vouchers</p>
+                    <p className="text-xs text-muted-foreground">View available deals</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link href="/account/help">
+              <Card className="rounded-2xl border-0 shadow-sm hover:shadow-md transition-all group cursor-pointer h-full">
+                <CardContent className="p-5 flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
+                    <HelpCircle className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm">Help Center</p>
+                    <p className="text-xs text-muted-foreground">Get support & FAQs</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <Card className="rounded-2xl border-0 shadow-sm">
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-lg font-semibold">Recent Activity</CardTitle>
+              <Link href="/account/notifications" className="text-sm text-primary hover:underline font-medium">
                 View All
               </Link>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex justify-around w-full">
-              {orderStatuses.map((status) => (
-                <Link href={status.href} key={status.name} className="flex flex-col items-center gap-2 text-foreground hover:text-primary transition-colors group">
-                  <div className="relative h-12 w-12 flex items-center justify-center rounded-xl bg-muted/50 group-hover:bg-primary/10 transition-colors">
-                    <status.icon className="h-6 w-6" strokeWidth={1.5} />
-                    {status.count > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                        {status.count}
-                      </span>
-                    )}
+            <div className="space-y-1">
+              {mockNotifications.map((notif, index) => (
+                <div
+                  key={index}
+                  className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors"
+                >
+                  <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <notif.icon className="h-4 w-4 text-primary" />
                   </div>
-                  <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">{status.name}</span>
-                </Link>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{notif.title}</p>
+                    <p className="text-xs text-muted-foreground">{notif.description}</p>
+                  </div>
+                  <span className="text-[11px] text-muted-foreground whitespace-nowrap pt-0.5">{notif.time}</span>
+                </div>
               ))}
             </div>
           </CardContent>

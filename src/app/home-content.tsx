@@ -23,7 +23,6 @@ import {
   Shirt,
   LayoutGrid
 } from 'lucide-react';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { MoormyBot } from '@/components/chat/moormy-bot';
 import { productService } from '@/supabase/services/products';
 import { storeService } from '@/supabase/services/stores';
@@ -268,50 +267,41 @@ export function HomeContent() {
             <HeroSection />
             
             {/* Category Navigation - Hidden on Mobile */}
-            <div className="hidden md:block bg-background py-6 shadow-sm border-b">
-              <div className="px-4 md:px-6">
-                <ScrollArea className="w-full whitespace-nowrap">
-                  <div className="flex w-max space-x-4 pb-4">
-                    <button
-                      onClick={() => setSelectedCategories([])}
-                      className={cn(
-                        "flex flex-col items-center justify-center min-w-[72px] gap-2 transition-all",
-                        selectedCategories.length === 0 ? "" : "opacity-60 grayscale"
-                      )}
-                    >
-                      <div className={cn(
-                        "h-14 w-14 rounded-full flex items-center justify-center shadow-lg transition-colors",
-                        selectedCategories.length === 0 ? "bg-primary text-primary-foreground" : "bg-secondary"
-                      )}>
-                        <LayoutGrid className="h-6 w-6" />
-                      </div>
-                      <span className="text-xs font-medium">All</span>
-                    </button>
-                    {allCategories.map((category) => {
-                      const Icon = categoryIcons[category] || LayoutGrid;
-                      const isSelected = selectedCategories.includes(category);
-                      return (
-                        <button
-                          key={category}
-                          onClick={() => toggleCategory(category)}
-                          className={cn(
-                            "flex flex-col items-center justify-center min-w-[72px] gap-2 transition-all",
-                            isSelected ? "" : "opacity-60 grayscale"
-                          )}
-                        >
-                          <div className={cn(
-                            "h-14 w-14 rounded-full flex items-center justify-center shadow-lg transition-colors",
-                            isSelected ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"
-                          )}>
-                            <Icon className="h-6 w-6" />
-                          </div>
-                          <span className="text-xs font-medium">{category}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <ScrollBar orientation="horizontal" />
-                </ScrollArea>
+            <div className="hidden md:block bg-white py-5">
+              <div className="px-4 md:px-8 lg:px-12">
+                <div className="flex items-center gap-3 flex-wrap justify-center">
+                  <button
+                    onClick={() => setSelectedCategories([])}
+                    className={cn(
+                      "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all border",
+                      selectedCategories.length === 0
+                        ? "bg-primary text-primary-foreground border-primary shadow-md"
+                        : "bg-white text-muted-foreground border-border hover:border-primary/40 hover:text-foreground hover:shadow-sm"
+                    )}
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                    All
+                  </button>
+                  {allCategories.map((category) => {
+                    const Icon = categoryIcons[category] || LayoutGrid;
+                    const isSelected = selectedCategories.includes(category);
+                    return (
+                      <button
+                        key={category}
+                        onClick={() => toggleCategory(category)}
+                        className={cn(
+                          "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all border",
+                          isSelected
+                            ? "bg-primary text-primary-foreground border-primary shadow-md"
+                            : "bg-white text-muted-foreground border-border hover:border-primary/40 hover:text-foreground hover:shadow-sm"
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                        {category}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 

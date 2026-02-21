@@ -187,8 +187,19 @@ export function Header(props: Partial<FilterProps>) {
   
   const isDropdownOpen = isFilterOpen || isSearchOpen;
 
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-40 bg-white">
+    <header className={cn(
+      "sticky top-0 z-40 transition-colors duration-200",
+      isScrolled ? "bg-transparent md:bg-white" : "bg-white"
+    )}>
       <div className="h-16 md:h-20 flex items-center justify-between gap-4 px-4 sm:px-6 relative">
         <Link href="/" className="hidden md:flex items-center mr-2">
           <Image 
@@ -206,8 +217,10 @@ export function Header(props: Partial<FilterProps>) {
               <div
                 data-state={isDropdownOpen ? 'open' : 'closed'}
                 className={cn(
-                  "relative bg-background z-20",
-                  isDropdownOpen ? 'rounded-t-[30px] border-x border-t' : 'rounded-[30px] border shadow-lg'
+                  "relative z-20",
+                  "bg-white md:bg-white",
+                  "shadow-[0_2px_12px_rgba(0,0,0,0.1)] md:shadow-lg",
+                  isDropdownOpen ? 'rounded-t-[30px] border-x border-t' : 'rounded-[30px] md:border'
                 )}
               >
                 <form onSubmit={handleFormSubmit}>
@@ -245,7 +258,7 @@ export function Header(props: Partial<FilterProps>) {
               >
                 <div className="overflow-hidden">
                     <div className={cn(
-                      "bg-background rounded-b-[30px] shadow-lg border-x max-h-[60vh] overflow-y-auto"
+                      "bg-white rounded-b-[30px] shadow-lg border-x max-h-[60vh] overflow-y-auto"
                     )}>
                        {isSearchOpen && (
                            <SearchDropdown
