@@ -26,7 +26,7 @@ export default function PaymentPage() {
         </div>
         <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
           {mockCards.map(card => (
-            <Card key={card.id} className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-card-shadow">
+            <Card key={card.id} className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
               <CardContent className="p-6">
                 <div className="flex justify-between items-start">
                   <div className="space-y-4">

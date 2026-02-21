@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, LogIn } from 'lucide-react';
+import { X } from 'lucide-react';
 import Link from 'next/link';
 import { useUser } from '@/supabase/provider';
 
@@ -46,7 +46,7 @@ export function AuthBanner() {
   return (
     <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-2 shadow-md">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-2">
           <p className="font-semibold text-sm">Login for full experience</p>
           <div className="flex items-center gap-2">
             <Button
@@ -55,18 +55,17 @@ export function AuthBanner() {
               className="rounded-full h-8 text-xs px-4 bg-white text-primary hover:bg-white/90"
             >
               <Link href="/account">
-                <LogIn className="h-3 w-3 mr-1" />
                 Login
               </Link>
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 text-white"
+              className="h-6 w-6 rounded-full bg-white/20 hover:bg-white/30 text-white"
               onClick={handleDismiss}
               aria-label="Dismiss banner"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3 w-3" />
             </Button>
           </div>
         </div>

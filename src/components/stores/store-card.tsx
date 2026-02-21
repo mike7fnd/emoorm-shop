@@ -14,7 +14,7 @@ type StoreCardProps = {
 export function StoreCard({ store }: StoreCardProps) {
   return (
     <Link href={`/stores/${store.id}`} className="group">
-      <Card className="overflow-hidden h-full flex flex-col shadow-card-shadow">
+      <Card className="overflow-hidden h-full flex flex-col">
         <div className="relative aspect-[4/3]">
           <Image
             src={store.image.src}

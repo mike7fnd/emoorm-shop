@@ -12,7 +12,7 @@ type ProductSuggestionCardProps = {
 export function ProductSuggestionCard({ product }: ProductSuggestionCardProps) {
   return (
     <Link href={`/products/${product.id}`} className="block w-24 flex-shrink-0 group">
-      <div className="relative aspect-square rounded-[15px] overflow-hidden bg-accent mb-2 shadow-card-shadow">
+      <div className="relative aspect-square rounded-[15px] overflow-hidden bg-accent mb-2">
         <Image
           src={product.image.src}
           alt={product.name}

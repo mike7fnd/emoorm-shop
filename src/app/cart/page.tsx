@@ -118,7 +118,7 @@ export default function CartPage() {
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
                       </Link>
                     </div>
-                    <Card className="rounded-[25px] shadow-card-shadow">
+                    <Card className="rounded-[25px]">
                       <CardContent className="p-0">
                         <div className="divide-y divide-border">
                           {items.map((item) => (
@@ -201,7 +201,7 @@ export default function CartPage() {
             </div>
 
             <div className="hidden md:block md:col-span-1">
-              <Card className="sticky top-20 shadow-card-shadow">
+              <Card className="sticky top-20">
                 <CardContent className="p-6 space-y-4">
                   <h2 className="text-xl font-semibold">Order Summary</h2>
                   <div className="flex justify-between">

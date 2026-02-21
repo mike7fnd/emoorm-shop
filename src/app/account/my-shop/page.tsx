@@ -118,7 +118,7 @@ export default function SellerDashboardPage() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 md:hidden">
           {stats.map((stat, i) => (
-            <Card key={i} className="rounded-2xl shadow-card-shadow">
+            <Card key={i} className="rounded-2xl">
               <CardContent className="p-4 flex flex-col items-center justify-center text-center">
                 <stat.icon className="h-5 w-5 text-primary mb-2" />
                 <p className="text-lg font-bold">{stat.value}</p>
@@ -129,7 +129,7 @@ export default function SellerDashboardPage() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-4">
-          <Card className="rounded-[30px] shadow-card-shadow cursor-pointer hover:shadow-lg transition-shadow" asChild>
+          <Card className="rounded-[30px] cursor-pointer" asChild>
             <Link href="/account/my-shop/products">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -144,7 +144,7 @@ export default function SellerDashboardPage() {
             </Link>
           </Card>
 
-          <Card className="rounded-[30px] shadow-card-shadow cursor-pointer hover:shadow-lg transition-shadow" asChild>
+          <Card className="rounded-[30px] cursor-pointer" asChild>
             <Link href="/account/my-shop/orders">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -159,7 +159,7 @@ export default function SellerDashboardPage() {
             </Link>
           </Card>
 
-          <Card className="rounded-[30px] shadow-card-shadow cursor-pointer hover:shadow-lg transition-shadow" asChild>
+          <Card className="rounded-[30px] cursor-pointer" asChild>
             <Link href="/account/my-shop/messages">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -175,7 +175,7 @@ export default function SellerDashboardPage() {
           </Card>
         </div>
 
-        <Card className="rounded-[30px] shadow-card-shadow mt-8">
+        <Card className="rounded-[30px] mt-8">
           <CardHeader>
             <CardTitle>Shop Details</CardTitle>
           </CardHeader>

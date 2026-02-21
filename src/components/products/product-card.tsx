@@ -54,7 +54,7 @@ export function ProductCard({ product, showMoveToCart = false }: ProductCardProp
 
   return (
     <div className="group">
-      <div className="relative aspect-square rounded-[15px] overflow-hidden shadow-card-shadow mb-2">
+      <div className="relative aspect-square rounded-[15px] overflow-hidden bg-white mb-2">
         <Link href={`/products/${product.id}`} className="block h-full w-full">
           <Image
             src={product.image.src}

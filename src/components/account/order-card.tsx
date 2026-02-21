@@ -32,7 +32,7 @@ const statusLabels: { [key: string]: string } = {
 
 export function OrderCard({ order }: OrderCardProps) {
   return (
-    <Card className="shadow-card-shadow">
+    <Card>
       <CardHeader className="flex flex-row justify-between items-center p-4">
         <p className="font-semibold text-sm">Order ID: {order.id}</p>
         <p className="text-sm text-primary font-medium">{statusLabels[order.status]}</p>

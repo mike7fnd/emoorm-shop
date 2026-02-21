@@ -7,7 +7,7 @@ export default function SettingsLoading() {
     <>
       <AccountHeader title="Account Settings" />
       <main className="container mx-auto px-4 pt-4 pb-24 md:pb-8">
-        <div className="rounded-[30px] p-0 shadow-card-shadow">
+        <div className="rounded-[30px] p-0 bg-white">
             <div className="space-y-0 divide-y">
                 {[...Array(3)].map((_, i) => (
                     <div key={i} className="p-4 flex items-center justify-between">

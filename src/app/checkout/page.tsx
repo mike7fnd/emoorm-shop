@@ -143,7 +143,7 @@ export default function CheckoutPage() {
           </div>
 
           <div className="md:col-span-2">
-            <Card className="sticky top-20 shadow-card-shadow">
+            <Card className="sticky top-20">
               <CardHeader>
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>

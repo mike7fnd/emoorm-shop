@@ -62,7 +62,7 @@ function LoginForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void }) {
   };
 
   return (
-    <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow bg-background/95 backdrop-blur-md">
+    <Card className="max-w-md mx-auto rounded-[30px] bg-background/95 backdrop-blur-md">
       <CardHeader className="text-center space-y-3">
         <div className="flex justify-center">
           <Image
@@ -171,7 +171,7 @@ function SignUpForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
 
   if (success) {
     return (
-      <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow bg-background/95 backdrop-blur-md">
+      <Card className="max-w-md mx-auto rounded-[30px] bg-background/95 backdrop-blur-md">
         <CardHeader className="text-center space-y-3">
           <div className="flex justify-center">
             <Image
@@ -198,7 +198,7 @@ function SignUpForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
   }
 
   return (
-    <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow bg-background/95 backdrop-blur-md">
+    <Card className="max-w-md mx-auto rounded-[30px] bg-background/95 backdrop-blur-md">
       <CardHeader className="text-center space-y-3">
         <div className="flex justify-center">
           <Image
@@ -480,7 +480,7 @@ export default function AccountPage() {
         </div>
 
         {/* Mobile Profile card */}
-        <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow">
+        <Card className="max-w-md mx-auto rounded-[30px]">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center">
               <input
@@ -505,7 +505,7 @@ export default function AccountPage() {
         </Card>
 
         {/* Mobile Orders card */}
-        <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow mt-4">
+        <Card className="max-w-md mx-auto rounded-[30px] mt-4">
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-lg">My Orders</CardTitle>
@@ -536,7 +536,7 @@ export default function AccountPage() {
         {/* Mobile Quick links grid */}
         <div className="max-w-md mx-auto grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
           <Link href={hasShop ? "/account/my-shop" : "/account/seller-registration"}>
-            <Card className="hover:bg-accent transition-colors h-full shadow-card-shadow">
+            <Card className="hover:bg-accent transition-colors h-full">
               <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
                 <Image src="https://lftz25oez4aqbxpq.public.blob.vercel-storage.com/image-kgYMsaYJpFuQ4XMNy0GYQ2zmrWOuJz.png" alt="Be a Seller" width={100} height={100} />
                 <p className="font-semibold text-sm mt-2">{hasShop ? 'My Shop' : 'Be a Seller'}</p>
@@ -544,7 +544,7 @@ export default function AccountPage() {
             </Card>
           </Link>
           <Link href="/account/vouchers">
-            <Card className="hover:bg-accent transition-colors h-full shadow-card-shadow">
+            <Card className="hover:bg-accent transition-colors h-full">
               <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
                 <Image src="https://lftz25oez4aqbxpq.public.blob.vercel-storage.com/image-xPBxqYxnSi0VmK3ALnqKVxdTMKcII9.png" alt="My Vouchers" width={100} height={100} />
                 <p className="font-semibold text-sm mt-2">My Vouchers</p>
@@ -552,7 +552,7 @@ export default function AccountPage() {
             </Card>
           </Link>
           <Link href="/account/help">
-            <Card className="hover:bg-accent transition-colors h-full shadow-card-shadow">
+            <Card className="hover:bg-accent transition-colors h-full">
               <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full">
                 <Image src="https://lftz25oez4aqbxpq.public.blob.vercel-storage.com/image-m3g6C1b2A0S8R9p2W6n4Q5Y7vX8Z2k.png" alt="Help Center" width={100} height={100} />
                 <p className="font-semibold text-sm mt-2">Help Center</p>
@@ -565,7 +565,7 @@ export default function AccountPage() {
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden md:block space-y-6">
         {/* Profile Card */}
-        <Card className="rounded-[30px] shadow-card-shadow">
+        <Card className="rounded-[30px]">
           <CardContent className="px-4 py-8">
             <div className="flex items-center gap-4">
               <input
@@ -592,7 +592,7 @@ export default function AccountPage() {
         </Card>
 
         {/* Orders Card */}
-        <Card className="rounded-[30px] shadow-card-shadow">
+        <Card className="rounded-[30px]">
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-lg">My Orders</CardTitle>

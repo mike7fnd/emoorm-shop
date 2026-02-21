@@ -10,7 +10,7 @@ export default function CheckoutLoading() {
         <div className="grid md:grid-cols-5 gap-8 md:gap-12 items-start">
           <div className="md:col-span-3 space-y-8">
             {/* Shipping Info Skeleton */}
-            <div className="rounded-[15px] p-6 space-y-6 shadow-card-shadow">
+            <div className="rounded-[15px] p-6 space-y-6 bg-white">
                 <Skeleton className="h-6 w-48 mb-4" />
                 <div className="flex items-center gap-4">
                     <Skeleton className="h-8 w-8" />
@@ -23,7 +23,7 @@ export default function CheckoutLoading() {
             </div>
 
             {/* Payment Method Skeleton */}
-            <div className="rounded-[15px] p-6 space-y-4 shadow-card-shadow">
+            <div className="rounded-[15px] p-6 space-y-4 bg-white">
               <Skeleton className="h-6 w-40 mb-4" />
               <Skeleton className="h-14 w-full" />
               <Skeleton className="h-14 w-full" />
@@ -32,7 +32,7 @@ export default function CheckoutLoading() {
           
           {/* Order Summary Skeleton */}
           <div className="md:col-span-2">
-             <div className="rounded-[15px] p-6 space-y-4 shadow-card-shadow">
+             <div className="rounded-[15px] p-6 space-y-4 bg-white">
               <Skeleton className="h-7 w-36 mb-4" />
               <div className="space-y-4">
                 {[...Array(2)].map((_, i) => (

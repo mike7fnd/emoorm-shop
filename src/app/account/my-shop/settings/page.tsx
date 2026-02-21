@@ -227,7 +227,7 @@ export default function SettingsPage() {
     <SellerPageLayout title="Shop Settings">
       <div className="pt-4 md:pt-0 space-y-6">
         {/* Basic Info Card */}
-        <Card className="rounded-[30px] shadow-card-shadow">
+        <Card className="rounded-[30px]">
           <CardHeader>
             <CardTitle>Edit Shop Details</CardTitle>
             <CardDescription>Update your shop information</CardDescription>
@@ -378,7 +378,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Store Photos Card */}
-        <Card className="rounded-[30px] shadow-card-shadow">
+        <Card className="rounded-[30px]">
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>

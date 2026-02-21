@@ -21,7 +21,7 @@ export default function SwitchAccountPage() {
         <div className="space-y-4">
           {mockAccounts.map(account => (
             <Card key={account.id} className={cn(
-              "hover:bg-accent transition-colors cursor-pointer shadow-card-shadow",
+              "hover:bg-accent transition-colors cursor-pointer",
               account.active && "border-primary"
             )}>
               <CardContent className="p-4 flex items-center justify-between">
@@ -42,7 +42,7 @@ export default function SwitchAccountPage() {
             </Card>
           ))}
 
-          <Card className="hover:bg-accent transition-colors cursor-pointer shadow-card-shadow">
+          <Card className="hover:bg-accent transition-colors cursor-pointer">
             <CardContent className="p-4 flex items-center gap-4">
               <div className="h-12 w-12 flex items-center justify-center bg-secondary rounded-full">
                 <PlusCircle className="h-6 w-6 text-muted-foreground" />

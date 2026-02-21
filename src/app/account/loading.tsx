@@ -16,7 +16,7 @@ export default function AccountLoading() {
         </div>
 
         <div className="container mx-auto px-4 pt-0 md:pt-8 relative">
-          <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow">
+          <Card className="max-w-md mx-auto rounded-[30px]">
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
                 <Skeleton className="h-24 w-24 rounded-full mb-4 border-4 border-background shadow-lg" />
@@ -26,7 +26,7 @@ export default function AccountLoading() {
             </CardContent>
           </Card>
 
-          <Card className="max-w-md mx-auto rounded-[30px] shadow-card-shadow mt-8">
+          <Card className="max-w-md mx-auto rounded-[30px] mt-8">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <Skeleton className="h-6 w-32" />

@@ -206,7 +206,7 @@ export function HomeContent() {
       <Header {...filterState} searchPlaceholder={searchPlaceholder} />
       <main className="flex-1">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex justify-center shadow-sm md:sticky md:top-16 bg-background z-30 relative">
+          <div className="flex justify-center shadow-sm md:sticky md:top-16 bg-white z-30 relative">
             <TabsList ref={tabContainerRef} value={activeTab} className="rounded-none bg-transparent p-0 h-auto gap-8">
               <TabsTrigger
                 value="shop"

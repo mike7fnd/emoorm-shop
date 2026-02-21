@@ -14,7 +14,7 @@ export default function AddressLoading() {
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="rounded-[15px] p-4 space-y-3 shadow-card-shadow">
+            <div key={i} className="rounded-[15px] p-4 space-y-3 bg-white">
                 <div className="flex justify-between items-start">
                     <div className="space-y-1">
                         <Skeleton className="h-5 w-32" />

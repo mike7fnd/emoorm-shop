@@ -22,7 +22,7 @@ export default function NotificationsPage() {
     <AccountPageLayout title="Notifications">
       <div className="pt-4 md:pt-0">
         <h1 className="hidden md:block text-2xl font-bold mb-6">Notifications</h1>
-        <Card className="rounded-[20px] shadow-card-shadow overflow-hidden">
+        <Card className="rounded-[20px] overflow-hidden">
           <ul className="divide-y">
               {mockNotifications.map(notification => (
                   <li key={notification.id} className={notification.unread ? 'bg-accent/50' : ''}>

@@ -188,7 +188,7 @@ export function Header(props: Partial<FilterProps>) {
   const isDropdownOpen = isFilterOpen || isSearchOpen;
 
   return (
-    <header className="sticky top-0 z-40 md:bg-background">
+    <header className="sticky top-0 z-40 bg-white">
       <div className="h-16 md:h-20 flex items-center justify-between gap-4 px-4 sm:px-6 relative">
         <Link href="/" className="hidden md:flex items-center mr-2">
           <Image 

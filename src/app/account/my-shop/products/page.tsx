@@ -185,7 +185,7 @@ export default function ProductsPage() {
         ) : (
           <div className="grid gap-4">
             {products.map((product) => (
-              <Card key={product.id} className="rounded-2xl shadow-card-shadow overflow-hidden">
+              <Card key={product.id} className="rounded-2xl overflow-hidden">
                 <CardContent className="p-4 flex gap-4">
                   <div className="relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-muted">
                     {product.image_url ? (

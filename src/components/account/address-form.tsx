@@ -68,7 +68,7 @@ export function AddressForm({ address, onSave, onCancel }: AddressFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSave)} className="space-y-8">
-        <Card className="shadow-card-shadow">
+        <Card>
           <CardContent className="p-6 space-y-6">
             <div className="grid sm:grid-cols-2 gap-4">
               <FormField

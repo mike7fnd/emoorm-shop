@@ -21,7 +21,7 @@ export default function VouchersPage() {
         <h1 className="hidden md:block text-2xl font-bold mb-6">My Vouchers</h1>
         <div className="space-y-4">
           {mockVouchers.map(voucher => (
-            <Card key={voucher.id} className="overflow-hidden shadow-card-shadow">
+            <Card key={voucher.id} className="overflow-hidden">
               <div className="flex">
                 <div className="bg-primary/10 flex flex-col items-center justify-center p-6 text-primary">
                   <Ticket className="w-10 h-10" />

@@ -27,7 +27,7 @@ type AddressCardProps = {
 
 export function AddressCard({ address, onEdit, onDelete, onSetDefault }: AddressCardProps) {
   return (
-    <Card className="flex flex-col shadow-card-shadow">
+    <Card className="flex flex-col">
       <CardHeader>
         <CardTitle className="flex justify-between items-start">
           <span className="text-lg">{address.name}</span>

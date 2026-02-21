@@ -64,7 +64,7 @@ export function StoreInfoCard({ store }: StoreInfoCardProps) {
 
   return (
     <div className="relative">
-      <div className="relative h-48 md:h-64 w-full rounded-[30px] overflow-hidden shadow-card-shadow">
+      <div className="relative h-48 md:h-64 w-full rounded-[30px] overflow-hidden">
         <Image
           src={store.image.src}
           alt={`${store.name} banner`}
@@ -75,7 +75,7 @@ export function StoreInfoCard({ store }: StoreInfoCardProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
       </div>
 
-      <Card className="relative mx-auto -mt-20 max-w-md rounded-[30px] shadow-card-shadow">
+      <Card className="relative mx-auto -mt-20 max-w-md rounded-[30px]">
         <CardContent className="p-6">
           <div className="flex flex-col items-center text-center">
             <h1 className="text-2xl font-bold">{store.name}</h1>

@@ -25,7 +25,7 @@ export default function MessagesPage() {
             <Input placeholder="Search messages..." className="pl-10" />
         </div>
 
-        <Card className="rounded-[20px] shadow-card-shadow overflow-hidden">
+        <Card className="rounded-[20px] overflow-hidden">
           <ul className="divide-y">
               {mockMessages.map(message => (
                   <li key={message.id}>
