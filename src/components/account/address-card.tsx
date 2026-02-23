@@ -5,18 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Home, Trash2, Edit, MoreVertical } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Badge } from "../ui/badge";
-
-type Address = {
-  id: string;
-  name: string;
-  phone: string;
-  addressLine1: string;
-  city: string;
-  province: string;
-  region: string;
-  zip: string;
-  isDefault: boolean;
-};
+import type { Address } from '@/supabase/services/addresses';
 
 type AddressCardProps = {
   address: Address;
@@ -31,20 +20,20 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault }: Address
       <CardHeader>
         <CardTitle className="flex justify-between items-start">
           <span className="text-lg">{address.name}</span>
-          {address.isDefault ? (
+          {address.is_default ? (
             <Badge>
               <Home className="mr-1.5 h-3 w-3" />
               Default
             </Badge>
           ) : (
-            <div className="w-6 h-6"></div> // Placeholder for alignment
+            <div className="w-6 h-6"></div>
           )}
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-grow space-y-2">
         <p className="text-sm text-muted-foreground">{address.phone}</p>
         <p className="text-sm text-muted-foreground">
-          {`${address.addressLine1}, ${address.city}, ${address.province} ${address.zip}`}
+          {[address.address_line_1, address.barangay, address.city, address.province].filter(Boolean).join(', ')} {address.zip}
         </p>
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
@@ -58,7 +47,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault }: Address
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {!address.isDefault && (
+            {!address.is_default && (
               <DropdownMenuItem onClick={onSetDefault}>Set as Default</DropdownMenuItem>
             )}
             <DropdownMenuItem onClick={onDelete} className="text-destructive focus:text-destructive">

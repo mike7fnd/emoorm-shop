@@ -2,37 +2,57 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CheckoutHeader } from '@/components/layout/checkout-header';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/use-cart';
 import { useAllProducts } from '@/hooks/use-all-products';
-import { CreditCard, Truck, ShieldCheck, Banknote, MapPin, ChevronRight, Home, Plus } from 'lucide-react';
+import { CreditCard, Truck, ShieldCheck, Banknote, MapPin, ChevronRight, Home, Plus, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
-
-// Mock address data
-const mockAddress = {
-  id: '1',
-  name: 'John Doe',
-  phone: '+63 912 345 6789',
-  addressLine1: '123 Fashion Ave',
-  city: 'Quezon City',
-  state: 'Metro Manila',
-  zip: '1101',
-  isDefault: true,
-};
+import { useUser } from '@/supabase/provider';
+import { addressService, Address } from '@/supabase/services/addresses';
+import { orderService, ProductSnapshot } from '@/supabase/services/orders';
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
   const { products } = useAllProducts();
   const { toast } = useToast();
-  const [shippingAddress, setShippingAddress] = useState(mockAddress);
+  const { user } = useUser();
+  const router = useRouter();
+  const [shippingAddress, setShippingAddress] = useState<Address | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [isLoadingAddress, setIsLoadingAddress] = useState(true);
 
+  // Load default address from DB
+  useEffect(() => {
+    const loadAddress = async () => {
+      if (!user?.id) {
+        setIsLoadingAddress(false);
+        return;
+      }
+      try {
+        const defaultAddr = await addressService.getDefaultAddress(user.id);
+        if (defaultAddr) {
+          setShippingAddress(defaultAddr);
+        } else {
+          // No default, try getting first address
+          const all = await addressService.getUserAddresses(user.id);
+          if (all.length > 0) setShippingAddress(all[0]);
+        }
+      } catch (err) {
+        console.error('Failed to load address:', err);
+      } finally {
+        setIsLoadingAddress(false);
+      }
+    };
+    loadAddress();
+  }, [user?.id]);
 
   const cartItems = cart
     .map(item => {
@@ -51,17 +71,68 @@ export default function CheckoutPage() {
   const shippingFee = 50;
   const total = subtotal + shippingFee;
 
-  const handlePlaceOrder = () => {
-    toast({
-      title: "Order Placed!",
-      description: "Thank you for your purchase.",
-    });
-    clearCart();
-    // In a real app, you'd redirect to an order confirmation page
+  const handlePlaceOrder = async () => {
+    if (!user?.id) {
+      toast({ title: 'Please log in', description: 'You need to be logged in to place an order.', variant: 'destructive' });
+      return;
+    }
+
+    if (!shippingAddress) {
+      toast({ title: 'No address', description: 'Please add a shipping address first.', variant: 'destructive' });
+      return;
+    }
+
+    setIsPlacingOrder(true);
+
+    try {
+      // Build product snapshots for order items
+      const snapshots: ProductSnapshot[] = cartItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.image?.src || '',
+        brand: item.brand || '',
+        sellerId: item.sellerId || '',
+      }));
+
+      const { order, error } = await orderService.createOrder(
+        {
+          userId: user.id,
+          items: cart,
+          totalAmount: total,
+          addressId: shippingAddress.id,
+          paymentMethod,
+          shippingFee,
+          subtotal,
+        },
+        snapshots
+      );
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: 'Order Placed!',
+        description: `Order ${order.order_number || order.id} has been placed successfully.`,
+      });
+
+      clearCart();
+      router.push('/account/orders/to-pay');
+    } catch (err: any) {
+      console.error('Failed to place order:', err);
+      toast({
+        title: 'Order Failed',
+        description: err.message || 'Something went wrong. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
 
   if (cartItems.length === 0) {
-    return null; // or a loading spinner, while redirecting
+    return null;
   }
 
   return (
@@ -78,14 +149,18 @@ export default function CheckoutPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                {shippingAddress ? (
+                {isLoadingAddress ? (
+                  <div className="flex items-center justify-center p-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : shippingAddress ? (
                   <Link href="/account/address">
                     <div className="flex items-center p-4 rounded-[15px] hover:bg-accent cursor-pointer transition-colors">
                       <MapPin className="h-8 w-8 text-primary mr-4" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <p className="font-semibold">{shippingAddress.name}</p>
-                          {shippingAddress.isDefault && (
+                          {shippingAddress.is_default && (
                             <div className="text-xs text-primary-foreground bg-primary px-2 py-0.5 rounded-full flex items-center gap-1">
                               <Home className="h-3 w-3" />
                               Default
@@ -93,7 +168,7 @@ export default function CheckoutPage() {
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground">{shippingAddress.phone}</p>
-                        <p className="text-sm text-muted-foreground">{`${shippingAddress.addressLine1}, ${shippingAddress.city}, ${shippingAddress.zip}`}</p>
+                        <p className="text-sm text-muted-foreground">{[shippingAddress.address_line_1, (shippingAddress as any).barangay, shippingAddress.city].filter(Boolean).join(', ')} {shippingAddress.zip}</p>
                       </div>
                       <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </div>
@@ -118,7 +193,7 @@ export default function CheckoutPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <RadioGroup defaultValue="card">
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
                   <Label htmlFor="card">
                     <div className="flex items-center space-x-2 p-4 rounded-md cursor-pointer has-[:checked]:bg-accent">
                       <RadioGroupItem value="card" id="card" />
@@ -186,8 +261,20 @@ export default function CheckoutPage() {
                   <span>Total</span>
                   <span>₱{total.toFixed(2)}</span>
                 </div>
-                <Button size="lg" className="w-full rounded-[30px]" onClick={handlePlaceOrder}>
-                  Place Order
+                <Button
+                  size="lg"
+                  className="w-full rounded-[30px]"
+                  onClick={handlePlaceOrder}
+                  disabled={isPlacingOrder || !shippingAddress}
+                >
+                  {isPlacingOrder ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Placing Order...
+                    </>
+                  ) : (
+                    'Place Order'
+                  )}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
                   By placing your order, you agree to our <Link href="#" className="underline">Terms of Service</Link> and <Link href="#" className="underline">Privacy Policy</Link>.

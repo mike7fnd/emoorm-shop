@@ -19,6 +19,7 @@ export function dbProductToProduct(dbProduct: DbProduct): Product {
     },
     category: dbProduct.category || 'Uncategorized',
     brand: dbProduct.seller_profiles?.shop_name || 'Unknown Store',
+    sellerId: dbProduct.seller_id,
     onSale: dbProduct.on_sale,
     stock: dbProduct.stock,
     dateAdded: dbProduct.created_at,

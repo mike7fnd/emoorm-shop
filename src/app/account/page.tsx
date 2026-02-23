@@ -14,12 +14,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { useUser, useAuth } from '@/supabase/provider';
 import { auth } from '@/supabase/auth';
 import { AccountPageLayout } from '@/components/layout/account-page-layout';
+import { orderService } from '@/supabase/services/orders';
+import { notificationService, Notification } from '@/supabase/services/notifications';
 
-const orderStatuses = [
-  { name: 'To Pay', icon: Wallet, href: '/account/orders/to-pay', count: 1 },
-  { name: 'To Ship', icon: Package, href: '/account/orders/to-ship', count: 2 },
-  { name: 'To Receive', icon: Truck, href: '/account/orders/to-receive', count: 1 },
-  { name: 'To Review', icon: Star, href: '/account/orders/to-review', count: 3 },
+const orderStatusDefs = [
+  { name: 'To Pay', icon: Wallet, href: '/account/orders/to-pay', key: 'to-pay' },
+  { name: 'To Ship', icon: Package, href: '/account/orders/to-ship', key: 'to-ship' },
+  { name: 'To Receive', icon: Truck, href: '/account/orders/to-receive', key: 'to-receive' },
+  { name: 'To Review', icon: Star, href: '/account/orders/to-review', key: 'to-review' },
 ];
 
 const menuOptions = [
@@ -31,11 +33,26 @@ const menuOptions = [
     { label: 'Switch Account', icon: Users, href: '/account/switch' },
 ];
 
-const mockNotifications = [
-    { icon: Truck, title: "Order Shipped", description: "Your order ORD-001 has been shipped.", time: "5m ago" },
-    { icon: Ticket, title: "New Voucher", description: "You've received a 10% off voucher!", time: "1h ago" },
-    { icon: Star, title: "Rate Product", description: "Please rate your recent purchase.", time: "3h ago" },
-]
+const notificationIcons: Record<string, any> = {
+  order: Truck,
+  voucher: Ticket,
+  review: Star,
+  system: Bell,
+};
+
+function getTimeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString('en-PH', { month: 'short', day: 'numeric' });
+}
 
 function LoginForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void }) {
   const [email, setEmail] = useState('');
@@ -284,6 +301,8 @@ export default function AccountPage() {
   const [showLoginForm, setShowLoginForm] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [orderCounts, setOrderCounts] = useState<Record<string, number>>({ 'to-pay': 0, 'to-ship': 0, 'to-receive': 0, 'to-review': 0 });
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -318,6 +337,14 @@ export default function AccountPage() {
         } else {
           setHasShop(false);
         }
+
+        // Load order counts from DB
+        const counts = await orderService.getOrderCountsByStatus(user.id);
+        setOrderCounts(counts);
+
+        // Load notifications from DB
+        const notifs = await notificationService.getUserNotifications(user.id, 10);
+        setNotifications(notifs);
       } catch (error) {
         console.error('Error loading user data:', error);
       } finally {
@@ -432,16 +459,22 @@ export default function AccountPage() {
                 <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <div className="p-1">
-                  {mockNotifications.map((notif, index) => (
-                    <DropdownMenuItem key={index} className="flex items-start gap-3 rounded-md">
-                      <notif.icon className="h-4 w-4 mt-1 text-primary" />
-                      <div className="flex-1">
-                        <p className="font-semibold text-sm">{notif.title}</p>
-                        <p className="text-xs text-muted-foreground">{notif.description}</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{notif.time}</p>
-                    </DropdownMenuItem>
-                  ))}
+                  {notifications.length > 0 ? notifications.slice(0, 5).map((notif) => {
+                    const NotifIcon = notificationIcons[notif.type] || Bell;
+                    const timeAgo = getTimeAgo(notif.created_at);
+                    return (
+                      <DropdownMenuItem key={notif.id} className="flex items-start gap-3 rounded-md">
+                        <NotifIcon className="h-4 w-4 mt-1 text-primary" />
+                        <div className="flex-1">
+                          <p className="font-semibold text-sm">{notif.title}</p>
+                          <p className="text-xs text-muted-foreground">{notif.message}</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{timeAgo}</p>
+                      </DropdownMenuItem>
+                    );
+                  }) : (
+                    <div className="py-4 text-center text-sm text-muted-foreground">No notifications</div>
+                  )}
                 </div>
                 <DropdownMenuSeparator />
                 <div className="p-1">
@@ -516,19 +549,22 @@ export default function AccountPage() {
           </CardHeader>
           <CardContent>
             <div className="flex justify-around w-full">
-              {orderStatuses.map((status) => (
+              {orderStatusDefs.map((status) => {
+                const count = orderCounts[status.key] || 0;
+                return (
                 <Link href={status.href} key={status.name} className="flex flex-col items-center gap-1 text-foreground hover:text-primary transition-colors">
                   <div className="relative">
                     <status.icon className="h-7 w-7" strokeWidth={1.5} />
-                    {status.count > 0 && (
+                    {count > 0 && (
                       <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                        {status.count}
+                        {count}
                       </span>
                     )}
                   </div>
                   <span className="text-xs font-medium text-muted-foreground">{status.name}</span>
                 </Link>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -616,21 +652,24 @@ export default function AccountPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-4 gap-4">
-              {orderStatuses.map((status) => (
+              {orderStatusDefs.map((status) => {
+                const count = orderCounts[status.key] || 0;
+                return (
                 <Link href={status.href} key={status.name} className="group">
                   <div className="flex flex-col items-center gap-2.5 p-4 rounded-xl border border-transparent hover:border-primary/20 hover:bg-primary/5 transition-all">
                     <div className="relative h-12 w-12 flex items-center justify-center rounded-full bg-muted/60 group-hover:bg-primary/10 transition-colors">
                       <status.icon className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" strokeWidth={1.8} />
-                      {status.count > 0 && (
+                      {count > 0 && (
                         <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[11px] w-5 h-5 rounded-full flex items-center justify-center font-bold shadow-sm">
-                          {status.count}
+                          {count}
                         </span>
                       )}
                     </div>
                     <span className="text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors">{status.name}</span>
                   </div>
                 </Link>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -693,21 +732,27 @@ export default function AccountPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-1">
-              {mockNotifications.map((notif, index) => (
+              {notifications.length > 0 ? notifications.slice(0, 5).map((notif) => {
+                const NotifIcon = notificationIcons[notif.type] || Bell;
+                const timeAgo = getTimeAgo(notif.created_at);
+                return (
                 <div
-                  key={index}
+                  key={notif.id}
                   className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors"
                 >
                   <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <notif.icon className="h-4 w-4 text-primary" />
+                    <NotifIcon className="h-4 w-4 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{notif.title}</p>
-                    <p className="text-xs text-muted-foreground">{notif.description}</p>
+                    <p className="text-xs text-muted-foreground">{notif.message}</p>
                   </div>
-                  <span className="text-[11px] text-muted-foreground whitespace-nowrap pt-0.5">{notif.time}</span>
+                  <span className="text-[11px] text-muted-foreground whitespace-nowrap pt-0.5">{timeAgo}</span>
                 </div>
-              ))}
+                );
+              }) : (
+                <div className="py-6 text-center text-sm text-muted-foreground">No recent activity</div>
+              )}
             </div>
           </CardContent>
         </Card>

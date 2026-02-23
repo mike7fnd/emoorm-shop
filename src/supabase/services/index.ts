@@ -8,3 +8,7 @@ export * from './profile';
 export * from './seller';
 export * from './products';
 export * from './stores';
+export * from './addresses';
+export * from './notifications';
+export * from './addresses';
+export * from './notifications';

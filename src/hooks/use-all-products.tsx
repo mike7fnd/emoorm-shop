@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { Product, Store } from '@/lib/data';
-import { products as staticProducts, stores as staticStores } from '@/lib/data';
 import { productService } from '@/supabase/services/products';
 import { storeService } from '@/supabase/services/stores';
 import { dbProductToProduct, storeViewToStore } from '@/lib/db-adapters';
@@ -19,15 +18,12 @@ async function loadFromDb() {
       storeService.getAllStores(),
     ]);
 
-    const dbConverted = dbProducts.map(dbProductToProduct);
-    cachedProducts = [...dbConverted, ...staticProducts];
-
-    const dbStoresConverted = dbStores.map(storeViewToStore);
-    cachedStores = [...dbStoresConverted, ...staticStores];
+    cachedProducts = dbProducts.map(dbProductToProduct);
+    cachedStores = dbStores.map(storeViewToStore);
   } catch (error) {
     console.error('Failed to load DB data:', error);
-    cachedProducts = staticProducts;
-    cachedStores = staticStores;
+    cachedProducts = [];
+    cachedStores = [];
   }
 }
 
@@ -40,15 +36,15 @@ function ensureLoaded(): Promise<void> {
 }
 
 /**
- * Hook that provides all products (DB + static) and a lookup function
+ * Hook that provides all products from the database
  */
 export function useAllProducts() {
-  const [products, setProducts] = useState<Product[]>(cachedProducts || staticProducts);
+  const [products, setProducts] = useState<Product[]>(cachedProducts || []);
   const [isLoaded, setIsLoaded] = useState(!!cachedProducts);
 
   useEffect(() => {
     ensureLoaded().then(() => {
-      setProducts(cachedProducts || staticProducts);
+      setProducts(cachedProducts || []);
       setIsLoaded(true);
     });
   }, []);
@@ -61,7 +57,7 @@ export function useAllProducts() {
     cachedProducts = null;
     cachedStores = null;
     await loadFromDb();
-    setProducts(cachedProducts || staticProducts);
+    setProducts(cachedProducts || []);
   }, []);
 
   return { products, findProduct, isLoaded, refresh };
@@ -71,12 +67,12 @@ export function useAllProducts() {
  * Hook for all stores
  */
 export function useAllStores() {
-  const [stores, setStores] = useState<Store[]>(cachedStores || staticStores);
+  const [stores, setStores] = useState<Store[]>(cachedStores || []);
   const [isLoaded, setIsLoaded] = useState(!!cachedStores);
 
   useEffect(() => {
     ensureLoaded().then(() => {
-      setStores(cachedStores || staticStores);
+      setStores(cachedStores || []);
       setIsLoaded(true);
     });
   }, []);

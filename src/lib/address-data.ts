@@ -1,23 +1,8 @@
-// Mock data for Philippine addresses.
-// In a real application, this would come from an API.
+// Philippine address data is now fetched from the PSGC API.
+// See src/lib/ph-address-api.ts for the live API integration.
+// These exports are kept for backward compatibility but are empty —
+// all address dropdowns now use the API directly.
 
-export const regions = [
-  { key: 'NCR', name: 'National Capital Region (NCR)' },
-  { key: 'VII', name: 'Central Visayas (Region VII)' },
-];
-
-export const provinces = [
-  { key: 'Metro Manila', name: 'Metro Manila', region: 'NCR' },
-  { key: 'Cebu', name: 'Cebu', region: 'VII' },
-];
-
-export const cities = [
-  // NCR
-  { key: 'Quezon City', name: 'Quezon City', province: 'Metro Manila' },
-  { key: 'Manila', name: 'Manila', province: 'Metro Manila' },
-  { key: 'Makati', name: 'Makati', province: 'Metro Manila' },
-  // Cebu
-  { key: 'Cebu City', name: 'Cebu City', province: 'Cebu' },
-  { key: 'Mandaue', name: 'Mandaue', province: 'Cebu' },
-  { key: 'Lapu-Lapu', name: 'Lapu-Lapu', province: 'Cebu' },
-];
+export const regions: { key: string; name: string }[] = [];
+export const provinces: { key: string; name: string; region: string }[] = [];
+export const cities: { key: string; name: string; province: string }[] = [];

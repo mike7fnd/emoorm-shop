@@ -1,61 +1,105 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { AccountPageLayout } from '@/components/layout/account-page-layout';
 import { Button } from '@/components/ui/button';
-import { Plus, MapPin } from 'lucide-react';
+import { Plus, MapPin, Loader2 } from 'lucide-react';
 import { AddressCard } from '@/components/account/address-card';
-import { AddressForm } from '@/components/account/address-form';
-
-const mockAddresses = [
-  {
-    id: '1',
-    name: 'John Doe',
-    phone: '+63 912 345 6789',
-    addressLine1: '123 Fashion Ave, Brgy. Central',
-    city: 'Quezon City',
-    province: 'Metro Manila',
-    region: 'NCR',
-    zip: '1101',
-    isDefault: true,
-  },
-  {
-    id: '2',
-    name: 'John Doe',
-    phone: '+63 998 765 4321',
-    addressLine1: '456 Style St, Brgy. Lahug',
-    city: 'Cebu City',
-    province: 'Cebu',
-    region: 'VII',
-    zip: '6000',
-    isDefault: false,
-  },
-];
+import { AddressForm, AddressFormValues } from '@/components/account/address-form';
+import { useUser } from '@/supabase/provider';
+import { addressService, Address } from '@/supabase/services/addresses';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AddressPage() {
-  const [addresses, setAddresses] = useState(mockAddresses);
-  const [editingAddress, setEditingAddress] = useState<any | null>(null);
+  const { user } = useUser();
+  const { toast } = useToast();
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const loadAddresses = async () => {
+    if (!user?.id) {
+      setIsLoading(false);
+      return;
+    }
+    try {
+      const data = await addressService.getUserAddresses(user.id);
+      setAddresses(data);
+    } catch (err) {
+      console.error('Failed to load addresses:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadAddresses();
+  }, [user?.id]);
 
   const handleAddNew = () => {
     setEditingAddress(null);
     setIsFormOpen(true);
   };
 
-  const handleEdit = (address: any) => {
+  const handleEdit = (address: Address) => {
     setEditingAddress(address);
     setIsFormOpen(true);
   };
 
-  const handleSave = (address: any) => {
-    if (address.id) {
-      setAddresses(addresses.map(a => a.id === address.id ? address : a));
-    } else {
-      setAddresses([...addresses, { ...address, id: `${Date.now()}` }]);
+  const handleSave = async (data: AddressFormValues) => {
+    if (!user?.id) return;
+    setIsSaving(true);
+
+    try {
+      if (editingAddress) {
+        // Update existing
+        const updated = await addressService.updateAddress(editingAddress.id, user.id, {
+          name: data.name,
+          phone: data.phone,
+          address_line_1: data.address_line_1,
+          barangay: data.barangay,
+          city: data.city,
+          province: data.province,
+          region: data.region,
+          zip: data.zip,
+          is_default: data.is_default,
+        });
+        if (updated) {
+          toast({ title: 'Address Updated', description: 'Your address has been updated.' });
+        } else {
+          toast({ title: 'Error', description: 'Failed to update address.', variant: 'destructive' });
+        }
+      } else {
+        // Create new
+        const created = await addressService.createAddress(user.id, {
+          name: data.name,
+          phone: data.phone,
+          address_line_1: data.address_line_1,
+          barangay: data.barangay,
+          city: data.city,
+          province: data.province,
+          region: data.region,
+          zip: data.zip,
+          is_default: data.is_default,
+        });
+        if (created) {
+          toast({ title: 'Address Added', description: 'New address has been saved.' });
+        } else {
+          toast({ title: 'Error', description: 'Failed to create address.', variant: 'destructive' });
+        }
+      }
+
+      await loadAddresses();
+      setIsFormOpen(false);
+      setEditingAddress(null);
+    } catch (err) {
+      console.error('Save address error:', err);
+      toast({ title: 'Error', description: 'Something went wrong.', variant: 'destructive' });
+    } finally {
+      setIsSaving(false);
     }
-    setIsFormOpen(false);
-    setEditingAddress(null);
   };
 
   const handleCancel = () => {
@@ -63,13 +107,37 @@ export default function AddressPage() {
     setEditingAddress(null);
   };
 
-  const handleDelete = (id: string) => {
-    setAddresses(addresses.filter(a => a.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!user?.id) return;
+    const success = await addressService.deleteAddress(id, user.id);
+    if (success) {
+      toast({ title: 'Address Deleted' });
+      await loadAddresses();
+    } else {
+      toast({ title: 'Error', description: 'Failed to delete address.', variant: 'destructive' });
+    }
   };
 
-  const handleSetDefault = (id: string) => {
-    setAddresses(addresses.map(a => ({ ...a, isDefault: a.id === id })));
+  const handleSetDefault = async (id: string) => {
+    if (!user?.id) return;
+    const success = await addressService.setDefault(id, user.id);
+    if (success) {
+      toast({ title: 'Default Updated', description: 'Default address has been changed.' });
+      await loadAddresses();
+    } else {
+      toast({ title: 'Error', description: 'Failed to set default.', variant: 'destructive' });
+    }
   };
+
+  if (isLoading) {
+    return (
+      <AccountPageLayout title="My Addresses">
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </AccountPageLayout>
+    );
+  }
 
   return (
     <AccountPageLayout title="My Addresses">
@@ -120,6 +188,7 @@ export default function AddressPage() {
               address={editingAddress}
               onSave={handleSave}
               onCancel={handleCancel}
+              isSaving={isSaving}
             />
           </div>
         )}

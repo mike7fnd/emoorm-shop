@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { stores as staticStores, products as staticProducts, placeholderImageMap, type Product, type Store } from '@/lib/data';
+import type { Product, Store } from '@/lib/data';
 import { ProductGrid } from '@/components/products/product-grid';
 import { StoreInfoCard } from '@/components/stores/store-info-card';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,6 @@ export default function StoreDetailPage() {
   useEffect(() => {
     const loadStore = async () => {
       try {
-        // Try to fetch from Supabase first
         const dbStore = await storeService.getStoreById(params.id);
         if (dbStore) {
           setStore(storeViewToStore(dbStore));
@@ -49,28 +48,9 @@ export default function StoreDetailPage() {
           if (dbProds.length > 0) {
             setStoreProducts(dbProds.map(dbProductToProduct));
           }
-        } else {
-          // Fall back to static data
-          const staticStore = staticStores.find((s) => s.id === params.id);
-          if (staticStore) {
-            setStore(staticStore);
-            setStoreProducts(staticProducts.filter((p) => p.brand === staticStore.name));
-            setStorePhotos([
-              placeholderImageMap.get('store-1'),
-              placeholderImageMap.get('store-2'),
-              placeholderImageMap.get('store-3'),
-              placeholderImageMap.get('store-4'),
-            ].filter(Boolean) as { src: string; hint: string }[]);
-          }
         }
       } catch (error) {
         console.error('Failed to load store:', error);
-        // Try static fallback
-        const staticStore = staticStores.find((s) => s.id === params.id);
-        if (staticStore) {
-          setStore(staticStore);
-          setStoreProducts(staticProducts.filter((p) => p.brand === staticStore.name));
-        }
       } finally {
         setIsLoading(false);
       }

@@ -89,6 +89,11 @@ export function ProductDetailClientPage({ product, reviewSummary, similarProduct
       description: `${product.name} has been added to your cart.`,
     });
   };
+
+  const handleBuyNow = async () => {
+    await addToCart(product.id);
+    router.push('/checkout');
+  };
   
   const handleShare = async () => {
     const shareData = {
@@ -418,7 +423,7 @@ export function ProductDetailClientPage({ product, reviewSummary, similarProduct
                         <span>Add to Cart</span>
                     </Button>
                 </div>
-                <Button size="lg" className="rounded-[30px] w-full flex-grow">
+                <Button size="lg" className="rounded-[30px] w-full flex-grow" onClick={handleBuyNow}>
                     Buy Now
                 </Button>
             </div>

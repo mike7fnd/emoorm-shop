@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Settings, MapPin, Plus, X, Camera, Tag } from 'lucide-react';
+import { Settings, MapPin, Plus, X, Camera, Tag, Loader2 as Loader2Icon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/supabase/provider';
 import { sellerService } from '@/supabase/services/seller';
@@ -20,6 +20,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { phAddressApi, type PsgcRegion, type PsgcProvince, type PsgcCityMunicipality } from '@/lib/ph-address-api';
 
 const LocationPickerMap = dynamic(() => import('@/components/map/location-picker-map'), {
   ssr: false,
@@ -69,11 +70,20 @@ export default function SettingsPage() {
     contactEmail: '',
     contactPhone: '',
     address: '',
+    region: '',
+    province: '',
     city: '',
-    state: '',
     zipCode: '',
-    country: '',
   });
+
+  // PSGC API state for address dropdowns
+  const [phRegions, setPhRegions] = useState<PsgcRegion[]>([]);
+  const [phProvinces, setPhProvinces] = useState<PsgcProvince[]>([]);
+  const [phCities, setPhCities] = useState<PsgcCityMunicipality[]>([]);
+  const [loadingPhRegions, setLoadingPhRegions] = useState(true);
+  const [loadingPhProvinces, setLoadingPhProvinces] = useState(false);
+  const [loadingPhCities, setLoadingPhCities] = useState(false);
+  const [isNcrShop, setIsNcrShop] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -95,10 +105,10 @@ export default function SettingsPage() {
             contactEmail: profile.contact_email || '',
             contactPhone: profile.contact_phone || '',
             address: profile.address || '',
+            region: (profile as any).region || '',
+            province: profile.state || '',
             city: profile.city || '',
-            state: profile.state || '',
             zipCode: profile.zip_code || '',
-            country: profile.country || '',
           });
           setLocation((profile as any).lat && (profile as any).lng ? { lat: (profile as any).lat, lng: (profile as any).lng } : null);
 
@@ -121,6 +131,47 @@ export default function SettingsPage() {
     loadProfile();
   }, [user?.id]);
 
+  // Load PH regions on mount
+  useEffect(() => {
+    phAddressApi.getRegions().then((data) => {
+      setPhRegions(data);
+      setLoadingPhRegions(false);
+    }).catch(() => setLoadingPhRegions(false));
+  }, []);
+
+  // When region changes, load provinces or cities (NCR)
+  useEffect(() => {
+    if (!formData.region) return;
+    const isNcr = phAddressApi.isNCR(formData.region);
+    setIsNcrShop(isNcr);
+
+    if (isNcr) {
+      setPhProvinces([]);
+      setLoadingPhCities(true);
+      phAddressApi.getCitiesMunicipalitiesByRegion(formData.region).then((data) => {
+        setPhCities(data);
+        setLoadingPhCities(false);
+      }).catch(() => setLoadingPhCities(false));
+    } else {
+      setLoadingPhProvinces(true);
+      setPhCities([]);
+      phAddressApi.getProvinces(formData.region).then((data) => {
+        setPhProvinces(data);
+        setLoadingPhProvinces(false);
+      }).catch(() => setLoadingPhProvinces(false));
+    }
+  }, [formData.region]);
+
+  // When province changes, load cities
+  useEffect(() => {
+    if (!formData.province || isNcrShop) return;
+    setLoadingPhCities(true);
+    phAddressApi.getCitiesMunicipalities(formData.province).then((data) => {
+      setPhCities(data);
+      setLoadingPhCities(false);
+    }).catch(() => setLoadingPhCities(false));
+  }, [formData.province, isNcrShop]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -142,10 +193,11 @@ export default function SettingsPage() {
           contact_email: formData.contactEmail,
           contact_phone: formData.contactPhone,
           address: formData.address,
+          region: formData.region,
           city: formData.city,
-          state: formData.state,
+          state: formData.province,
           zip_code: formData.zipCode,
-          country: formData.country,
+          country: 'Philippines',
           lat: location?.lat || null,
           lng: location?.lng || null,
           updated_at: new Date().toISOString(),
@@ -293,29 +345,58 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Input id="address" name="address" value={formData.address} onChange={handleChange} className="rounded-xl" />
+                <Label htmlFor="address">Street Address</Label>
+                <Input id="address" name="address" value={formData.address} onChange={handleChange} className="rounded-xl" placeholder="Street, Building, House No." />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="city">City</Label>
-                  <Input id="city" name="city" value={formData.city} onChange={handleChange} className="rounded-xl" />
+                  <Label>Region</Label>
+                  <Select value={formData.region} onValueChange={(val) => setFormData(prev => ({ ...prev, region: val, province: '', city: '' }))}>
+                    <SelectTrigger className="rounded-xl">
+                      <SelectValue placeholder={loadingPhRegions ? 'Loading...' : 'Select region'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {phRegions.map(r => (
+                        <SelectItem key={r.code} value={r.code}>{r.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="state">Province/State</Label>
-                  <Input id="state" name="state" value={formData.state} onChange={handleChange} className="rounded-xl" />
-                </div>
+                {!isNcrShop && (
+                  <div className="space-y-2">
+                    <Label>Province</Label>
+                    <Select value={formData.province} onValueChange={(val) => setFormData(prev => ({ ...prev, province: val, city: '' }))} disabled={!formData.region || loadingPhProvinces}>
+                      <SelectTrigger className="rounded-xl">
+                        <SelectValue placeholder={loadingPhProvinces ? 'Loading...' : 'Select province'} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {phProvinces.map(p => (
+                          <SelectItem key={p.code} value={p.code}>{p.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="zipCode">Zip Code</Label>
+                  <Label>City/Municipality</Label>
+                  <Select value={formData.city} onValueChange={(val) => setFormData(prev => ({ ...prev, city: val }))} disabled={(!formData.province && !isNcrShop) || loadingPhCities}>
+                    <SelectTrigger className="rounded-xl">
+                      <SelectValue placeholder={loadingPhCities ? 'Loading...' : 'Select city'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {phCities.map(c => (
+                        <SelectItem key={c.code} value={c.name}>{c.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="zipCode">ZIP Code</Label>
                   <Input id="zipCode" name="zipCode" value={formData.zipCode} onChange={handleChange} className="rounded-xl" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
-                  <Input id="country" name="country" value={formData.country} onChange={handleChange} className="rounded-xl" />
                 </div>
               </div>
 

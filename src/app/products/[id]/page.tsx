@@ -1,7 +1,6 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { products as staticProducts } from '@/lib/data';
 import { ProductDetailClientPage } from './product-detail-client-page';
 import { useState, useEffect } from 'react';
 import type { Product } from '@/lib/data';
@@ -19,7 +18,6 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        // Try Supabase first
         const dbProduct = await productService.getProductById(params.id);
         if (dbProduct) {
           const p = dbProductToProduct(dbProduct);
@@ -31,40 +29,10 @@ export default function ProductDetailPage() {
             .filter((s) => s.id !== params.id)
             .slice(0, 4)
             .map(dbProductToProduct);
-          
-          // If not enough DB similar products, supplement with static
-          if (similar.length < 4) {
-            const staticSimilar = staticProducts
-              .filter((sp) => sp.category === p.category && sp.id !== p.id && !similar.find(s => s.id === sp.id))
-              .slice(0, 4 - similar.length);
-            setSimilarProducts([...similar, ...staticSimilar]);
-          } else {
-            setSimilarProducts(similar);
-          }
-        } else {
-          // Fall back to static data
-          const staticProduct = staticProducts.find((p) => p.id === params.id);
-          if (staticProduct) {
-            setProduct(staticProduct);
-            setSimilarProducts(
-              staticProducts
-                .filter((p) => p.category === staticProduct.category && p.id !== staticProduct.id)
-                .slice(0, 4)
-            );
-          }
+          setSimilarProducts(similar);
         }
       } catch (error) {
         console.error('Failed to load product:', error);
-        // Fall back to static
-        const staticProduct = staticProducts.find((p) => p.id === params.id);
-        if (staticProduct) {
-          setProduct(staticProduct);
-          setSimilarProducts(
-            staticProducts
-              .filter((p) => p.category === staticProduct.category && p.id !== staticProduct.id)
-              .slice(0, 4)
-          );
-        }
       } finally {
         setIsLoading(false);
       }

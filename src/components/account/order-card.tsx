@@ -4,23 +4,11 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { OrderItemCard } from './order-item-card';
-import type { Product } from '@/lib/data';
-
-type OrderItem = {
-  product: Product;
-  quantity: number;
-};
-
-type Order = {
-  id: string;
-  status: string;
-  date: string;
-  total: number;
-  items: OrderItem[];
-};
+import type { OrderWithItems } from '@/supabase/services/orders';
 
 type OrderCardProps = {
-  order: Order;
+  order: OrderWithItems;
+  onUpdateStatus?: (orderId: string, status: string) => void;
 };
 
 const statusLabels: { [key: string]: string } = {
@@ -28,31 +16,51 @@ const statusLabels: { [key: string]: string } = {
   'to-ship': 'To Ship',
   'to-receive': 'To Receive',
   'to-review': 'To Review',
+  'completed': 'Completed',
+  'cancelled': 'Cancelled',
 };
 
-export function OrderCard({ order }: OrderCardProps) {
+export function OrderCard({ order, onUpdateStatus }: OrderCardProps) {
+  const orderDate = new Date(order.created_at).toLocaleDateString('en-PH', {
+    year: 'numeric', month: 'short', day: 'numeric',
+  });
+
   return (
     <Card>
       <CardHeader className="flex flex-row justify-between items-center p-4">
-        <p className="font-semibold text-sm">Order ID: {order.id}</p>
-        <p className="text-sm text-primary font-medium">{statusLabels[order.status]}</p>
+        <div>
+          <p className="font-semibold text-sm">Order: {order.order_number || order.id.slice(0, 8)}</p>
+          <p className="text-xs text-muted-foreground">{orderDate}</p>
+        </div>
+        <p className="text-sm text-primary font-medium">{statusLabels[order.status] || order.status}</p>
       </CardHeader>
       <Separator />
       <CardContent className="p-4 space-y-4">
-        {order.items.map((item, index) => (
+        {order.order_items?.map((item, index) => (
           <OrderItemCard key={index} item={item} />
         ))}
       </CardContent>
       <Separator />
       <CardFooter className="flex-col items-end gap-4 p-4">
         <p className="text-md">
-          Order Total: <span className="font-bold text-lg">₱{order.total.toFixed(2)}</span>
+          Order Total: <span className="font-bold text-lg">₱{order.total_amount.toFixed(2)}</span>
         </p>
         <div className="flex gap-2">
-          <Button variant="outline" className="rounded-[30px]">View Details</Button>
-          {order.status === 'to-pay' && <Button className="rounded-[30px]">Pay Now</Button>}
-          {order.status === 'to-receive' && <Button className="rounded-[30px]">Order Received</Button>}
-          {order.status === 'to-review' && <Button className="rounded-[30px]">Rate</Button>}
+          {order.status === 'to-pay' && onUpdateStatus && (
+            <Button variant="outline" className="rounded-[30px]" onClick={() => onUpdateStatus(order.id, 'cancelled')}>
+              Cancel
+            </Button>
+          )}
+          {order.status === 'to-receive' && onUpdateStatus && (
+            <Button className="rounded-[30px]" onClick={() => onUpdateStatus(order.id, 'to-review')}>
+              Order Received
+            </Button>
+          )}
+          {order.status === 'to-review' && onUpdateStatus && (
+            <Button className="rounded-[30px]" onClick={() => onUpdateStatus(order.id, 'completed')}>
+              Rate
+            </Button>
+          )}
         </div>
       </CardFooter>
     </Card>

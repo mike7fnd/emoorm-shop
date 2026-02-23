@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { ProductView } from '@/components/products/product-view';
-import { products as staticProducts, categories as staticCategories, brands as staticBrands, stores as staticStores, type Product, type Store } from '@/lib/data';
+import type { Product, Store } from '@/lib/data';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StoreCard } from '@/components/stores/store-card';
 import { ProductGrid } from '@/components/products/product-grid';
@@ -55,11 +55,11 @@ export function HomeContent() {
   const [isShrunk, setIsShrunk] = useState(false);
   const tabContainerRef = useRef<HTMLDivElement>(null);
 
-  // Real data state - merged static + DB
-  const [allProducts, setAllProducts] = useState<Product[]>(staticProducts);
-  const [allStores, setAllStores] = useState<Store[]>(staticStores);
-  const [allCategories, setAllCategories] = useState<string[]>(staticCategories);
-  const [allBrands, setAllBrands] = useState<string[]>(staticBrands);
+  // Real data state - loaded from Supabase DB only
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [allStores, setAllStores] = useState<Store[]>([]);
+  const [allCategories, setAllCategories] = useState<string[]>([]);
+  const [allBrands, setAllBrands] = useState<string[]>([]);
   const [dbDataLoaded, setDbDataLoaded] = useState(false);
 
   // Load real data from Supabase on mount
@@ -71,23 +71,21 @@ export function HomeContent() {
           storeService.getAllStores(),
         ]);
 
-        // Merge DB products with static (DB first, then static as fallback)
+        // Only use DB products
         const dbConverted = dbProducts.map(dbProductToProduct);
-        const mergedProducts = [...dbConverted, ...staticProducts];
-        setAllProducts(mergedProducts);
+        setAllProducts(dbConverted);
 
-        // Merge DB stores with static
+        // Only use DB stores
         const dbStoresConverted = dbStores.map(storeViewToStore);
-        const mergedStores = [...dbStoresConverted, ...staticStores];
-        setAllStores(mergedStores);
+        setAllStores(dbStoresConverted);
 
-        // Update categories and brands from merged data
-        const cats = [...new Set(mergedProducts.map(p => p.category))];
-        const brnds = [...new Set(mergedProducts.map(p => p.brand))];
+        // Derive categories and brands from DB data
+        const cats = [...new Set(dbConverted.map(p => p.category))];
+        const brnds = [...new Set(dbConverted.map(p => p.brand))];
         setAllCategories(cats);
         setAllBrands(brnds);
       } catch (error) {
-        console.error('Failed to load DB data, using static fallback:', error);
+        console.error('Failed to load DB data:', error);
       } finally {
         setDbDataLoaded(true);
       }

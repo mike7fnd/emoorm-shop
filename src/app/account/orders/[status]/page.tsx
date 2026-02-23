@@ -1,47 +1,16 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { AccountPageLayout } from '@/components/layout/account-page-layout';
-import { products } from '@/lib/data';  // Mock orders use static data for now
 import { OrderCard } from '@/components/account/order-card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { List, Wallet, Package, Truck, Star } from 'lucide-react';
-
-const mockOrders = [
-  {
-    id: 'ORD-001',
-    status: 'to-ship',
-    date: '2024-07-20',
-    total: 8000,
-    items: [
-      { product: products[2], quantity: 1 },
-      { product: products[3], quantity: 1 },
-    ],
-  },
-  {
-    id: 'ORD-002',
-    status: 'to-receive',
-    date: '2024-07-19',
-    total: 4500,
-    items: [{ product: products[1], quantity: 1 }],
-  },
-  {
-    id: 'ORD-003',
-    status: 'to-pay',
-    date: '2024-07-21',
-    total: 1500,
-    items: [{ product: products[0], quantity: 1 }],
-  },
-  {
-    id: 'ORD-004',
-    status: 'to-review',
-    date: '2024-07-18',
-    total: 7500,
-    items: [{ product: products[4], quantity: 1 }],
-  },
-];
+import { List, Wallet, Package, Truck, Star, Loader2 } from 'lucide-react';
+import { useUser } from '@/supabase/provider';
+import { orderService, OrderWithItems } from '@/supabase/services/orders';
+import { useToast } from '@/hooks/use-toast';
 
 const statusTabs = [
   { value: 'all', label: 'All', icon: List },
@@ -54,10 +23,43 @@ const statusTabs = [
 export default function OrdersPage() {
   const params = useParams();
   const currentStatus = Array.isArray(params.status) ? params.status[0] : params.status || 'all';
+  const { user } = useUser();
+  const { toast } = useToast();
+  const [orders, setOrders] = useState<OrderWithItems[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredOrders = mockOrders.filter(
-    (order) => currentStatus === 'all' || order.status === currentStatus
-  );
+  const loadOrders = async () => {
+    if (!user?.id) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const data = await orderService.getUserOrders(user.id, currentStatus);
+      setOrders(data);
+    } catch (err) {
+      console.error('Failed to load orders:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadOrders();
+  }, [user?.id, currentStatus]);
+
+  const handleUpdateStatus = async (orderId: string, newStatus: string) => {
+    if (!user?.id) return;
+
+    const success = await orderService.updateOrderStatus(orderId, user.id, newStatus);
+    if (success) {
+      toast({ title: 'Order Updated', description: `Order status changed to ${newStatus.replace('-', ' ')}.` });
+      loadOrders(); // Refresh
+    } else {
+      toast({ title: 'Update Failed', description: 'Could not update order status.', variant: 'destructive' });
+    }
+  };
 
   return (
     <AccountPageLayout title="My Orders" hideMobileHeader>
@@ -82,10 +84,14 @@ export default function OrdersPage() {
           </div>
         </Tabs>
 
-        {filteredOrders.length > 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : orders.length > 0 ? (
           <div className="space-y-6">
-            {filteredOrders.map((order) => (
-              <OrderCard key={order.id} order={order} />
+            {orders.map((order) => (
+              <OrderCard key={order.id} order={order} onUpdateStatus={handleUpdateStatus} />
             ))}
           </div>
         ) : (
