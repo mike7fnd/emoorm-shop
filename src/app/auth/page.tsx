@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { AuthLoginForm, AuthSignUpForm } from '@/components/auth/auth-bottom-sheet';
 import { useUser } from '@/supabase/provider';
 import { Loader2 } from 'lucide-react';
 
-export default function AuthPage() {
+function AuthPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user, isLoading } = useUser();
@@ -70,5 +70,13 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense>
+      <AuthPageInner />
+    </Suspense>
   );
 }
