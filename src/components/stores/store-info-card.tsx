@@ -117,7 +117,7 @@ export function StoreInfoCard({ store }: StoreInfoCardProps) {
                 )}
                 {isFollowing ? 'Following' : 'Follow'}
               </Button>
-              <Button variant="outline" className="w-full rounded-[30px]">
+              <Button variant="ghost" className="w-full rounded-[30px] bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
                 <MessageCircle className="mr-2 h-4 w-4" />
                 Message
               </Button>

@@ -4,11 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   User, Settings, MapPin, CreditCard, HelpCircle, Shield, Users,
-  Bell, MessageSquare, Ticket, Store, LogOut, ShoppingCart, ChevronRight
+  Bell, MessageSquare, Ticket, Store, LogOut, ShoppingCart, ChevronRight, LogIn, UserPlus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser, useAuth } from '@/supabase/provider';
+import { useAuthSheet } from '@/components/auth/auth-bottom-sheet';
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { auth } from '@/supabase/auth';
 import { Separator } from '@/components/ui/separator';
@@ -40,6 +42,7 @@ export function DesktopAccountSidebar() {
   const pathname = usePathname();
   const { user } = useUser();
   const supabase = useAuth();
+  const { openAuthSheet } = useAuthSheet();
   const [hasShop, setHasShop] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState('https://picsum.photos/seed/user/100/100');
 
@@ -80,11 +83,9 @@ export function DesktopAccountSidebar() {
     return () => window.removeEventListener('avatar-updated', handleAvatarUpdate);
   }, [user?.id, supabase]);
 
-  if (!user) return null;
-
-  const userEmail = user.email || 'User';
-  const userName = user.user_metadata?.name || userEmail.split('@')[0] || 'User';
-  const userAvatar = user.user_metadata?.avatar_url || avatarSrc;
+  const userEmail = user?.email || 'User';
+  const userName = user?.user_metadata?.name || userEmail.split('@')[0] || 'User';
+  const userAvatar = user?.user_metadata?.avatar_url || avatarSrc;
 
   const isActive = (href: string) => {
     if (href === '/account/orders/all') {
@@ -119,6 +120,7 @@ export function DesktopAccountSidebar() {
   return (
     <aside className="hidden md:flex flex-col w-[260px] shrink-0 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto bg-white rounded-2xl shadow-sm p-2">
       {/* User profile card */}
+      {user ? (
       <div className="flex items-center gap-3 px-3 py-4 mb-2">
         <Avatar className="h-11 w-11 border-2 border-primary/20 shadow-sm">
           <AvatarImage src={userAvatar} data-ai-hint="portrait" />
@@ -129,6 +131,29 @@ export function DesktopAccountSidebar() {
           <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
         </div>
       </div>
+      ) : (
+      <div className="px-3 py-4 mb-2 space-y-3">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-11 w-11 border-2 border-muted shadow-sm">
+            <AvatarFallback className="bg-muted"><User className="h-5 w-5 text-muted-foreground" /></AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold">Welcome!</p>
+            <p className="text-xs text-muted-foreground">Login for full experience</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" className="flex-1 rounded-full text-xs h-8" onClick={() => openAuthSheet('login')}>
+            <LogIn className="h-3.5 w-3.5 mr-1" />
+            Login
+          </Button>
+          <Button size="sm" variant="ghost" className="flex-1 rounded-full text-xs h-8 bg-muted text-muted-foreground shadow-none hover:bg-muted/80" onClick={() => openAuthSheet('signup')}>
+            <UserPlus className="h-3.5 w-3.5 mr-1" />
+            Sign Up
+          </Button>
+        </div>
+      </div>
+      )}
 
       <Separator className="mb-2" />
 
@@ -171,6 +196,7 @@ export function DesktopAccountSidebar() {
       <Separator className="my-3" />
 
       {/* Sign out */}
+      {user && (
       <div className="px-1 pb-4">
         <button
           onClick={handleSignOut}
@@ -180,6 +206,8 @@ export function DesktopAccountSidebar() {
           <span>Sign Out</span>
         </button>
       </div>
+      )}
+
     </aside>
   );
 }

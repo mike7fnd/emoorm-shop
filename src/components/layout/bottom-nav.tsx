@@ -51,9 +51,9 @@ export function BottomNav() {
   if (!isClient) {
     return (
         <nav className={cn(
-            "h-16 bg-white flex justify-around items-center shadow-[0_-2px_6px_rgba(0,0,0,0.06)]",
+            "bg-white flex justify-around items-center shadow-[0_-2px_6px_rgba(0,0,0,0.06)]",
             "safe-area-bottom",
-            "pb-2 md:pb-0"
+            "pt-2"
         )}>
             {/* Render a skeleton or placeholder */}
         </nav>
@@ -62,9 +62,9 @@ export function BottomNav() {
 
   return (
     <nav className={cn(
-        "h-16 bg-white flex justify-around items-center shadow-[0_-2px_6px_rgba(0,0,0,0.06)]",
+        "bg-white flex justify-around items-center shadow-[0_-2px_6px_rgba(0,0,0,0.06)]",
         "safe-area-bottom",
-        "pb-2 md:pb-0"
+        "pt-2"
     )}>
       {navItems.map((item) => (
         <Link

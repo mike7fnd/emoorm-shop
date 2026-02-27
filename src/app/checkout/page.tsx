@@ -15,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { useUser } from '@/supabase/provider';
+import { useAuthSheet } from '@/components/auth/auth-bottom-sheet';
 import { addressService, Address } from '@/supabase/services/addresses';
 import { orderService, ProductSnapshot } from '@/supabase/services/orders';
 
@@ -23,6 +24,7 @@ export default function CheckoutPage() {
   const { products } = useAllProducts();
   const { toast } = useToast();
   const { user } = useUser();
+  const { openAuthSheet } = useAuthSheet();
   const router = useRouter();
   const [shippingAddress, setShippingAddress] = useState<Address | null>(null);
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -73,7 +75,7 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async () => {
     if (!user?.id) {
-      toast({ title: 'Please log in', description: 'You need to be logged in to place an order.', variant: 'destructive' });
+      openAuthSheet('login');
       return;
     }
 

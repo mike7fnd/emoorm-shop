@@ -47,7 +47,7 @@ export function OrderCard({ order, onUpdateStatus }: OrderCardProps) {
         </p>
         <div className="flex gap-2">
           {order.status === 'to-pay' && onUpdateStatus && (
-            <Button variant="outline" className="rounded-[30px]" onClick={() => onUpdateStatus(order.id, 'cancelled')}>
+            <Button variant="ghost" className="rounded-[30px] bg-muted text-muted-foreground shadow-none hover:bg-muted/80" onClick={() => onUpdateStatus(order.id, 'cancelled')}>
               Cancel
             </Button>
           )}

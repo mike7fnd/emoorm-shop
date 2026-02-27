@@ -14,7 +14,7 @@ export function AccountHeader({ title }: AccountHeaderProps) {
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm safe-area-top">
       <div className="h-14 flex items-center justify-between px-3">
         <Button variant="ghost" size="icon" aria-label="Back" onClick={() => router.back()} className="shrink-0">
           <ChevronLeft className="h-5 w-5" />

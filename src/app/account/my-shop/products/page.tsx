@@ -16,6 +16,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import Image from 'next/image';
+import { storageService } from '@/supabase/services/storage';
+import { ImageUpload } from '@/components/ui/image-upload';
 
 const CATEGORIES = [
   'Fresh Produce', 'Local Delicacies', 'Handicrafts', 'Pantry Staples',
@@ -48,6 +50,7 @@ export default function ProductsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [editingProduct, setEditingProduct] = useState<DbProduct | null>(null);
   const [form, setForm] = useState<ProductFormData>(emptyForm);
 
@@ -268,13 +271,31 @@ export default function ProductsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image_url">Product Image URL</Label>
-                <Input id="image_url" value={form.image_url} onChange={(e) => setForm(f => ({ ...f, image_url: e.target.value }))} className="rounded-xl" placeholder="https://example.com/image.jpg" />
-                {form.image_url && (
-                  <div className="relative w-full h-40 rounded-xl overflow-hidden bg-muted mt-2">
-                    <Image src={form.image_url} alt="Preview" fill className="object-cover" sizes="400px" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                  </div>
-                )}
+                <Label>Product Image</Label>
+                <ImageUpload
+                  value={form.image_url}
+                  isUploading={isUploadingImage}
+                  shape="square"
+                  maxSizeMB={5}
+                  onFileSelected={async (file) => {
+                    if (!sellerProfile) return;
+                    setIsUploadingImage(true);
+                    try {
+                      const url = await storageService.uploadProductImage(sellerProfile.id, file);
+                      if (url) {
+                        setForm(f => ({ ...f, image_url: url }));
+                      } else {
+                        toast({ variant: 'destructive', title: 'Upload failed', description: 'Could not upload image. Try again.' });
+                      }
+                    } catch (err) {
+                      console.error('Product image upload error:', err);
+                      toast({ variant: 'destructive', title: 'Upload error', description: 'Something went wrong uploading the image.' });
+                    } finally {
+                      setIsUploadingImage(false);
+                    }
+                  }}
+                  onClear={() => setForm(f => ({ ...f, image_url: '' }))}
+                />
               </div>
 
               <div className="flex items-center justify-between">
@@ -304,7 +325,7 @@ export default function ProductsPage() {
                 <Button type="submit" disabled={isSaving} className="rounded-full flex-grow">
                   {isSaving ? 'Saving...' : editingProduct ? 'Update Product' : 'Add Product'}
                 </Button>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-full">
+                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="rounded-full bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
                   Cancel
                 </Button>
               </div>

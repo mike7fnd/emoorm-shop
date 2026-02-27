@@ -73,7 +73,7 @@ export default function StoreDetailPage() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
         <h1 className="text-xl font-bold">Store not found</h1>
         <p className="text-muted-foreground mb-4">This store doesn&apos;t exist or has been removed.</p>
-        <Button onClick={() => router.back()} className="rounded-full">Go Back</Button>
+        <Button variant="ghost" onClick={() => router.back()} className="rounded-full bg-muted text-muted-foreground shadow-none hover:bg-muted/80">Go Back</Button>
       </div>
     );
   }

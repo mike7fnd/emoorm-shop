@@ -5,17 +5,18 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
 import { User, Wallet, Package, Truck, Star, LogOut, MoreVertical, Settings, HelpCircle, Users, CreditCard, Shield, MapPin, Bell, MessageSquare, Ticket, Store, LogIn, UserPlus, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { useUser, useAuth } from '@/supabase/provider';
 import { auth } from '@/supabase/auth';
+import { useAuthSheet } from '@/components/auth/auth-bottom-sheet';
 import { AccountPageLayout } from '@/components/layout/account-page-layout';
 import { orderService } from '@/supabase/services/orders';
 import { notificationService, Notification } from '@/supabase/services/notifications';
+import { storageService } from '@/supabase/services/storage';
 
 const orderStatusDefs = [
   { name: 'To Pay', icon: Wallet, href: '/account/orders/to-pay', key: 'to-pay' },
@@ -54,252 +55,14 @@ function getTimeAgo(dateStr: string): string {
   return date.toLocaleDateString('en-PH', { month: 'short', day: 'numeric' });
 }
 
-function LoginForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const supabase = useAuth();
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { error: signInError } = await auth.signInWithPassword(supabase, { email, password });
-      if (signInError) {
-        setError(signInError.message);
-      }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during login');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <Card className="max-w-md mx-auto rounded-[30px] bg-background/95 backdrop-blur-md">
-      <CardHeader className="text-center space-y-3">
-        <div className="flex justify-center">
-          <Image
-            src="https://image2url.com/r2/default/images/1769822813493-b3b30748-4fdb-4a02-b16a-f2d85a882941.png"
-            alt="E-Moorm Logo"
-            width={80}
-            height={80}
-            className="h-20 w-20 object-contain"
-          />
-        </div>
-        <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-        <p className="text-muted-foreground text-sm">Login to your account</p>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleLogin} className="space-y-4">
-          {error && (
-            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
-              {error}
-            </div>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <Button type="submit" className="w-full rounded-full" disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <LogIn className="h-4 w-4 mr-2" />
-            )}
-            Login
-          </Button>
-          <div className="text-center text-sm">
-            <span className="text-muted-foreground">Don&apos;t have an account? </span>
-            <button
-              type="button"
-              onClick={onSwitchToSignUp}
-              className="text-primary hover:underline font-medium"
-            >
-              Sign Up
-            </button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
-  );
-}
-
-function SignUpForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const supabase = useAuth();
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setIsLoading(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const { error: signUpError } = await auth.signUp(supabase, { email, password });
-      if (signUpError) {
-        setError(signUpError.message);
-      } else {
-        setSuccess(true);
-      }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during signup');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (success) {
-    return (
-      <Card className="max-w-md mx-auto rounded-[30px] bg-background/95 backdrop-blur-md">
-        <CardHeader className="text-center space-y-3">
-          <div className="flex justify-center">
-            <Image
-              src="https://image2url.com/r2/default/images/1769822813493-b3b30748-4fdb-4a02-b16a-f2d85a882941.png"
-              alt="E-Moorm Logo"
-              width={80}
-              height={80}
-              className="h-20 w-20 object-contain"
-            />
-          </div>
-          <CardTitle className="text-2xl font-bold">Check Your Email</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center space-y-4">
-          <p className="text-muted-foreground">
-            We&apos;ve sent a confirmation email to <strong>{email}</strong>.
-            Please check your inbox and click the link to verify your account.
-          </p>
-          <Button onClick={onSwitchToLogin} className="w-full rounded-full">
-            Back to Login
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="max-w-md mx-auto rounded-[30px] bg-background/95 backdrop-blur-md">
-      <CardHeader className="text-center space-y-3">
-        <div className="flex justify-center">
-          <Image
-            src="https://image2url.com/r2/default/images/1769822813493-b3b30748-4fdb-4a02-b16a-f2d85a882941.png"
-            alt="E-Moorm Logo"
-            width={80}
-            height={80}
-            className="h-20 w-20 object-contain"
-          />
-        </div>
-        <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-        <p className="text-muted-foreground text-sm">Sign up for a new account</p>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSignUp} className="space-y-4">
-          {error && (
-            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
-              {error}
-            </div>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="signup-email">Email</Label>
-            <Input
-              id="signup-email"
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="signup-password">Password</Label>
-            <Input
-              id="signup-password"
-              type="password"
-              placeholder="At least 6 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirm Password</Label>
-            <Input
-              id="confirm-password"
-              type="password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </div>
-          <Button type="submit" className="w-full rounded-full" disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <UserPlus className="h-4 w-4 mr-2" />
-            )}
-            Sign Up
-          </Button>
-          <div className="text-center text-sm">
-            <span className="text-muted-foreground">Already have an account? </span>
-            <button
-              type="button"
-              onClick={onSwitchToLogin}
-              className="text-primary hover:underline font-medium"
-            >
-              Login
-            </button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
-  );
-}
-
 export default function AccountPage() {
   const { user, isLoading: isUserLoading } = useUser();
   const supabase = useAuth();
+  const { openAuthSheet } = useAuthSheet();
   const [avatarSrc, setAvatarSrc] = useState('https://picsum.photos/seed/user/100/100');
   const [hasShop, setHasShop] = useState(false);
-  const [showLoginForm, setShowLoginForm] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [orderCounts, setOrderCounts] = useState<Record<string, number>>({ 'to-pay': 0, 'to-ship': 0, 'to-receive': 0, 'to-review': 0 });
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -362,31 +125,38 @@ export default function AccountPage() {
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && user?.id) {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const result = reader.result as string;
-        setAvatarSrc(result);
+      // Show instant preview
+      const previewUrl = URL.createObjectURL(file);
+      setAvatarSrc(previewUrl);
+      setIsUploadingAvatar(true);
 
-        try {
-          // Update avatar in Supabase
-          const { error } = await supabase
-            .from('profiles')
-            .update({ avatar_url: result })
-            .eq('id', user.id);
+      try {
+        // Upload to Supabase Storage
+        const publicUrl = await storageService.uploadAvatar(user.id, file);
+        if (!publicUrl) throw new Error('Upload failed');
 
-          if (error) throw error;
+        // Save URL in database
+        const { error } = await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('id', user.id);
 
-          // Dispatch custom event for components listening
-          window.dispatchEvent(
-            new CustomEvent('avatar-updated', { detail: { newAvatar: result } })
-          );
-        } catch (error) {
-          console.error('Failed to update avatar:', error);
-          // Revert avatar change on error
-          setAvatarSrc('https://picsum.photos/seed/user/100/100');
-        }
-      };
-      reader.readAsDataURL(file);
+        if (error) throw error;
+
+        setAvatarSrc(publicUrl);
+
+        // Dispatch custom event for components listening
+        window.dispatchEvent(
+          new CustomEvent('avatar-updated', { detail: { newAvatar: publicUrl } })
+        );
+      } catch (error) {
+        console.error('Failed to upload avatar:', error);
+        // Revert avatar change on error
+        setAvatarSrc('https://picsum.photos/seed/user/100/100');
+      } finally {
+        setIsUploadingAvatar(false);
+        URL.revokeObjectURL(previewUrl);
+      }
     }
   };
 
@@ -405,36 +175,10 @@ export default function AccountPage() {
     );
   }
 
-  // Show login/signup form if not logged in — full-screen, no nav
-  if (!user) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
-        {/* Fullscreen background image */}
-        <Image
-          src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1920&auto=format&fit=crop"
-          alt="Background"
-          fill
-          className="object-cover"
-          priority
-        />
-        {/* Dark overlay for readability */}
-        <div className="absolute inset-0 bg-black/40" />
-        {/* Login / Signup card */}
-        <div className="relative z-10 w-full px-4">
-          {showLoginForm ? (
-            <LoginForm onSwitchToSignUp={() => setShowLoginForm(false)} />
-          ) : (
-            <SignUpForm onSwitchToLogin={() => setShowLoginForm(true)} />
-          )}
-        </div>
-      </div>
-    );
-  }
-
   // User is logged in - show account page
-  const userEmail = user.email || 'User';
-  const userName = user.user_metadata?.name || userEmail.split('@')[0] || 'User';
-  const userAvatar = user.user_metadata?.avatar_url || avatarSrc;
+  const userEmail = user?.email || 'User';
+  const userName = user?.user_metadata?.name || userEmail.split('@')[0] || 'User';
+  const userAvatar = user?.user_metadata?.avatar_url || avatarSrc;
 
   return (
     <AccountPageLayout title="My Account" hideMobileHeader>
@@ -443,6 +187,7 @@ export default function AccountPage() {
         {/* Mobile header with action buttons */}
         <div className="h-16 flex items-center justify-between px-4 -mx-4">
           <h1 className="text-lg font-semibold">My Account</h1>
+          {user && (
           <div className="flex items-center">
             <Button variant="ghost" size="icon" asChild>
               <Link href="/account/messages">
@@ -510,9 +255,11 @@ export default function AccountPage() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          )}
         </div>
 
-        {/* Mobile Profile card */}
+        {/* Mobile Profile card — or Login prompt if not logged in */}
+        {user ? (
         <Card className="max-w-md mx-auto rounded-[30px]">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center">
@@ -530,12 +277,44 @@ export default function AccountPage() {
                     <User className="h-10 w-10" />
                   </AvatarFallback>
                 </Avatar>
+                {isUploadingAvatar && (
+                  <div className="absolute inset-0 mb-4 flex items-center justify-center rounded-full bg-black/50">
+                    <Loader2 className="h-6 w-6 text-white animate-spin" />
+                  </div>
+                )}
               </button>
               <h2 className="text-2xl font-bold">{userName}</h2>
               <p className="text-muted-foreground">{userEmail}</p>
             </div>
           </CardContent>
         </Card>
+        ) : (
+        <Card className="max-w-md mx-auto rounded-[30px]">
+          <CardContent className="pt-6 pb-6">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
+                <AvatarFallback className="bg-muted">
+                  <User className="h-10 w-10 text-muted-foreground" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="space-y-1">
+                <h2 className="text-lg font-semibold">Login for your first order</h2>
+                <p className="text-sm text-muted-foreground">Sign in to track orders, save items and more</p>
+              </div>
+              <div className="flex gap-3 w-full max-w-xs">
+                <Button className="flex-1 rounded-full" onClick={() => openAuthSheet('login')}>
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Login
+                </Button>
+                <Button variant="ghost" className="flex-1 rounded-full bg-muted text-muted-foreground shadow-none hover:bg-muted/80" onClick={() => openAuthSheet('signup')}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Sign Up
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        )}
 
         {/* Mobile Orders card */}
         <Card className="max-w-md mx-auto rounded-[30px] mt-4">
@@ -600,7 +379,8 @@ export default function AccountPage() {
 
       {/* ===== DESKTOP LAYOUT ===== */}
       <div className="hidden md:block space-y-6">
-        {/* Profile Banner Card */}
+        {/* Profile Banner Card — or Login prompt if not logged in */}
+        {user ? (
         <Card className="rounded-2xl overflow-hidden border-0 shadow-sm">
           {/* Cover gradient */}
           <div className="h-32 bg-gradient-to-br from-primary/80 via-primary/60 to-primary/40 relative">
@@ -622,16 +402,22 @@ export default function AccountPage() {
                     <User className="h-10 w-10" />
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                  <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">Edit</span>
-                </div>
+                {isUploadingAvatar ? (
+                  <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
+                    <Loader2 className="h-6 w-6 text-white animate-spin" />
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                    <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">Edit</span>
+                  </div>
+                )}
               </button>
               <div className="min-w-0 flex-1 pb-1">
                 <h1 className="text-2xl font-bold truncate">{userName}</h1>
                 <p className="text-muted-foreground text-sm truncate">{userEmail}</p>
               </div>
               <Link href="/account/settings">
-                <Button variant="outline" size="sm" className="rounded-full gap-2 shadow-sm">
+                <Button variant="ghost" size="sm" className="rounded-full gap-2 bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
                   <Settings className="h-4 w-4" />
                   Edit Profile
                 </Button>
@@ -639,6 +425,36 @@ export default function AccountPage() {
             </div>
           </CardContent>
         </Card>
+        ) : (
+        <Card className="rounded-2xl overflow-hidden border-0 shadow-sm">
+          <div className="h-32 bg-gradient-to-br from-primary/80 via-primary/60 to-primary/40 relative">
+            <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/3965545/pexels-photo-3965545.jpeg?auto=compress&cs=tinysrgb&w=800')] bg-cover bg-center opacity-20" />
+          </div>
+          <CardContent className="relative px-6 pb-6">
+            <div className="flex items-end gap-5 -mt-12">
+              <Avatar className="h-24 w-24 border-4 border-background shadow-lg ring-2 ring-primary/20 shrink-0">
+                <AvatarFallback className="bg-muted">
+                  <User className="h-10 w-10 text-muted-foreground" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1 pb-1">
+                <h1 className="text-xl font-semibold">Login for your first order</h1>
+                <p className="text-muted-foreground text-sm">Sign in to track orders, save items and more</p>
+              </div>
+              <div className="flex gap-2 pb-1">
+                <Button className="rounded-full gap-2" onClick={() => openAuthSheet('login')}>
+                  <LogIn className="h-4 w-4" />
+                  Login
+                </Button>
+                <Button variant="ghost" className="rounded-full gap-2 bg-muted text-muted-foreground shadow-none hover:bg-muted/80" onClick={() => openAuthSheet('signup')}>
+                  <UserPlus className="h-4 w-4" />
+                  Sign Up
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        )}
 
         {/* Orders Card */}
         <Card className="rounded-2xl border-0 shadow-sm">

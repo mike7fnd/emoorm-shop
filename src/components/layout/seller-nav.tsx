@@ -1,49 +1,45 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Package, ShoppingCart, MessageSquare, Settings, Home } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Home, Package, ShoppingCart, MessageSquare, Settings } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const sellerNavItems = [
-  { href: "/account/my-shop", label: "Dashboard", icon: Home },
-  { href: "/account/my-shop/products", label: "Products", icon: Package },
-  { href: "/account/my-shop/orders", label: "Orders", icon: ShoppingCart },
-  { href: "/account/my-shop/messages", label: "Messages", icon: MessageSquare },
-  { href: "/account/my-shop/settings", label: "Settings", icon: Settings },
+  { label: 'Dashboard', icon: Home, href: '/account/my-shop' },
+  { label: 'Products', icon: Package, href: '/account/my-shop/products' },
+  { label: 'Orders', icon: ShoppingCart, href: '/account/my-shop/orders' },
+  { label: 'Messages', icon: MessageSquare, href: '/account/my-shop/messages' },
+  { label: 'Settings', icon: Settings, href: '/account/my-shop/settings' },
 ];
 
 export function SellerNav() {
   const pathname = usePathname();
+  const isSellerPage = pathname?.startsWith('/account/my-shop');
 
-  const isSellerPath = pathname.startsWith("/account/my-shop");
+  if (!isSellerPage) return null;
 
-  if (!isSellerPath) {
-    return null;
-  }
+  const isActive = (href: string) => pathname === href;
 
   return (
     <nav className={cn(
-      "h-16 bg-background flex justify-around items-center shadow-[0_-2px_6px_rgba(0,0,0,0.06)]",
+      "bg-white flex justify-around items-center shadow-[0_-2px_6px_rgba(0,0,0,0.06)]",
       "safe-area-bottom",
-      "pb-2 md:hidden"
+      "pt-2"
     )}>
-      {sellerNavItems.map((item) => {
-        const isActive = pathname === item.href;
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex flex-col items-center justify-center w-full h-full text-xs font-medium gap-1 pt-1",
-              isActive ? "text-primary" : "text-muted-foreground"
-            )}
-          >
-            <item.icon className="h-7 w-7" strokeWidth={1.5} />
-            <span>{item.label}</span>
-          </Link>
-        );
-      })}
+      {sellerNavItems.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(
+            "flex flex-col items-center justify-center w-full h-full text-xs font-medium gap-1 pt-1",
+            isActive(item.href) ? "text-primary" : "text-muted-foreground"
+          )}
+        >
+          <item.icon className="h-7 w-7" strokeWidth={1.5} />
+          <span>{item.label}</span>
+        </Link>
+      ))}
     </nav>
   );
 }

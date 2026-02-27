@@ -1,0 +1,386 @@
+================================================================================
+                         E-MOORM — YOUR LOCAL MARKETPLACE
+               E-Commerce Platform for Oriental Mindoro, Philippines
+================================================================================
+
+
+WHAT IS E-MOORM?
+--------------------------------------------------------------------------------
+
+E-Moorm (E-Commerce for Mindoro) is a modern e-commerce platform that showcases
+and sells authentic, locally-produced goods from Oriental Mindoro, Philippines.
+
+It connects local merchants, artisans, and farmers in Oriental Mindoro with
+buyers looking for fresh produce, local delicacies, handicrafts, native fashion,
+wellness products, and more.
+
+The platform is a Progressive Web App (PWA) — installable on mobile devices,
+works offline, and delivers a native app-like experience.
+
+Target Market:
+  - Buyers: Consumers who want access to authentic Mindoro-sourced products
+  - Sellers: Local merchants, artisans, and farmers across Oriental Mindoro
+             municipalities (Calapan, Naujan, Baco, Puerto Galera, etc.)
+
+Product Categories:
+  Fresh Produce, Local Delicacies, Handicrafts, Pantry Staples,
+  Wellness & Herbs, Home Decor, Beverages, Native Fashion
+
+
+TECH STACK
+--------------------------------------------------------------------------------
+
+  Framework        Next.js 15 (App Router, React, TypeScript)
+  UI               Tailwind CSS + shadcn/ui component library
+  Database         Supabase (PostgreSQL with Row-Level Security)
+  Authentication   Firebase Auth (email/password)
+  Image Storage    Supabase Storage (avatars, product images, store images)
+  AI Chatbot       Firebase Genkit (Moormy Bot)
+  Maps             Leaflet / react-leaflet for store locations
+  Address API      Philippine Standard Geographic Code (PSGC) API
+  PWA Support      Service worker, manifest, offline page, install prompt
+
+
+================================================================================
+                              COMPLETE APP FLOW
+================================================================================
+
+
+1. FIRST LAUNCH — ONBOARDING
+--------------------------------------------------------------------------------
+
+When a user opens the app for the first time, a full-screen onboarding splash
+appears with 3 slides:
+
+  Slide 1: "Welcome to E-Moorm — Your Local Marketplace"
+           Discover authentic Mindoro products
+
+  Slide 2: "Shop Local Goodness — Fresh & Authentic"
+           Browse produce, delicacies, fashion, handicrafts
+
+  Slide 3: "Fast & Easy Checkout — Seamless Experience"
+           Secure payments, doorstep delivery
+
+The user can skip or tap "Get Started" to proceed. Onboarding state is saved
+in localStorage so it only shows once.
+
+
+2. HOME PAGE — BROWSING
+--------------------------------------------------------------------------------
+
+The home page has three tabs:
+
+  [Shop]   Product grid with hero banner, category filters, brand filters,
+           price range slider (up to P15,000), and text search with
+           typo-tolerant matching.
+
+  [Stores] Grid of store cards showing store name, image, rating,
+           product count, and follower count.
+
+  [Deals]  Products currently marked as on-sale.
+
+A floating AI chatbot button (Moormy Bot) is available at the bottom-right
+for product discovery assistance and support.
+
+
+3. PRODUCT DETAIL
+--------------------------------------------------------------------------------
+
+  User taps a product from the grid
+    |
+    v
+  Product Detail Page loads from Supabase
+    - Product image, name, price, description
+    - Stock status and sold count
+    - Star rating and review summary (average, distribution)
+    - "Add to Cart" button
+    - "Add to Wishlist" button (heart icon)
+    - Similar products section (same category)
+    - Supports AUCTION products with bid tracking and countdown timer
+
+
+4. STORE DETAIL
+--------------------------------------------------------------------------------
+
+  User taps a store card
+    |
+    v
+  Store Detail Page
+    - Store info card (name, about, address, rating, products, followers)
+    - Store photos gallery
+    - Map showing store location (Leaflet)
+    - Store products listing
+    - Follow and share actions
+
+
+5. AUTHENTICATION
+--------------------------------------------------------------------------------
+
+  User can browse freely without logging in.
+  Login is required for: cart, wishlist, checkout, account, selling.
+
+  Auth Flow:
+    - Dedicated /auth page with Login / Sign Up toggle
+    - Split-screen: hero image (left) + form (right) on desktop
+    - Auth Bottom Sheet — can pop up from anywhere (e.g. at checkout)
+    - Firebase Auth handles email/password
+    - On login, Supabase profile is loaded (avatar, name, etc.)
+    - Auto-redirect to /account if already authenticated
+
+
+6. WISHLIST
+--------------------------------------------------------------------------------
+
+  User taps heart icon on any product
+    |
+    v
+  Product saved to wishlist (Supabase)
+    |
+    v
+  /wishlist page shows all saved items
+    - Grid display
+    - Sort by: Date Added, Price Low-High, Price High-Low
+    - Share wishlist link
+    - Quick add to cart from wishlist
+
+
+7. CART FLOW
+--------------------------------------------------------------------------------
+
+  User adds product to cart
+    |
+    v
+  /cart page
+    - Items grouped by store/shop
+    - Checkboxes for selective checkout (per-item and per-shop toggle)
+    - Quantity controls (+/-)
+    - Remove item
+    - Subtotal + P50 shipping fee = Total
+    - Recommended products based on cart categories
+    |
+    v
+  "Checkout" button
+
+
+8. CHECKOUT FLOW
+--------------------------------------------------------------------------------
+
+  /checkout page
+    |
+    +-- Shipping Address
+    |     Load default from DB, or choose/add address
+    |     Links to /account/address for management
+    |
+    +-- Payment Method
+    |     Cash on Delivery / Digital Wallet / Credit Card
+    |
+    +-- Order Summary
+    |     Item list, subtotal, shipping, total
+    |
+    +-- "Place Order" button
+          |
+          v
+        Transactional order creation:
+          1. INSERT order into orders table
+          2. INSERT items into order_items table (with product snapshots)
+          3. DELETE items from carts table
+          4. Rollback everything on failure
+          |
+          v
+        Redirect to /account/orders/to-pay
+        Success toast notification
+
+
+9. ORDER TRACKING
+--------------------------------------------------------------------------------
+
+  Orders move through a status pipeline:
+
+    To Pay  -->  To Ship  -->  To Receive  -->  To Review  -->  Completed
+                                                                    |
+                                                               (or Cancelled)
+
+  Buyer sees order counts for each status on their Account page.
+  Seller can update order status from the seller dashboard.
+
+
+10. ACCOUNT PAGE
+--------------------------------------------------------------------------------
+
+  /account
+    |
+    +-- Profile card (avatar, name, email)
+    |     Avatar is uploadable to Supabase Storage
+    |
+    +-- Order status shortcuts with live counts
+    |     To Pay | To Ship | To Receive | To Review
+    |
+    +-- Menu options:
+    |     - Account Settings
+    |     - Shipping Addresses
+    |     - Payment Methods
+    |     - Help Center
+    |     - Privacy Policy
+    |     - Switch Account
+    |
+    +-- Notifications feed (order, voucher, review, system)
+    |
+    +-- Messages
+    |
+    +-- "Start Selling" link  (if not yet a seller)
+    |       or
+    +-- "My Shop" link        (if already a seller)
+    |
+    +-- Sign Out
+
+
+11. SELLER REGISTRATION
+--------------------------------------------------------------------------------
+
+  /account/seller-registration
+
+  A floating intro card explains the seller program, then:
+
+    Step 1: Enter shop name and description
+
+    Step 2: Business address (locked to Oriental Mindoro)
+            - Region: MIMAROPA (auto-set)
+            - Province: Oriental Mindoro (auto-set)
+            - Municipality: select from 15 municipalities via PSGC API
+              (Baco, Bansud, Bongabong, Bulalacao, Calapan, Gloria,
+               Mansalay, Naujan, Pinamalayan, Pola, Puerto Galera,
+               Roxas, San Teodoro, Socorro, Victoria)
+            - Barangay: loaded when municipality is selected
+            - Street address: free text
+
+    Step 3: Contact phone (+63 prefix, PH format)
+
+    Step 4: Submit
+            Creates seller_profiles record in Supabase
+            Redirects to /account/my-shop
+
+
+12. SELLER DASHBOARD (MY SHOP)
+--------------------------------------------------------------------------------
+
+  /account/my-shop
+
+  Dashboard overview:
+    - Product count, order count, total sales
+    - Quick action buttons: View Store, Settings, Add Product
+
+  Sub-pages:
+
+    /account/my-shop/products — Product Management
+      - View all products in card grid
+      - Add new product (dialog form):
+          Name, Description, Price, Stock, Category,
+          Product Image (drag-and-drop upload to Supabase Storage),
+          On Sale toggle, Auction toggle (bid amount, end time)
+      - Edit existing products
+      - Delete products
+
+    /account/my-shop/orders — Order Management
+      - Tab view: All | Awaiting Payment | To Ship | Shipped |
+                  Delivered | Completed | Cancelled
+      - Update order status (ship, mark delivered, etc.)
+
+    /account/my-shop/settings — Shop Settings
+      - Edit shop name, description, about
+      - Upload shop logo (circle) and banner (wide) via drag-and-drop
+      - Add store photos with zoom preview and captions
+      - Contact email and phone
+      - Business address with PSGC API dropdowns
+      - Map location picker
+      - Store genre/category badges (max 5)
+
+    /account/my-shop/messages — Customer Messages
+
+  Seller has a dedicated bottom navigation bar:
+    Dashboard | Products | Orders | Messages | Settings
+
+
+13. AI CHATBOT (MOORMY BOT)
+--------------------------------------------------------------------------------
+
+  A floating chat button on the home page opens Moormy Bot.
+
+  Powered by Firebase Genkit AI, the bot can:
+    - Help users discover products
+    - Answer questions about local stores
+    - Provide customer support
+    - Knows about local Mindoro stores and products
+
+
+14. MAPS INTEGRATION
+--------------------------------------------------------------------------------
+
+  Store detail pages include an interactive Leaflet map showing the
+  store's geographic location with lat/lng coordinates.
+
+  Sellers can set their store location via a map picker in settings.
+
+
+15. PWA FEATURES
+--------------------------------------------------------------------------------
+
+  - Installable on mobile (Add to Home Screen prompt)
+  - Service worker for caching and offline support
+  - Offline fallback page
+  - App manifest with icons and shortcuts
+  - Apple mobile web app support (status bar, splash screen)
+  - Safe area insets for notched devices
+
+
+================================================================================
+                            NAVIGATION STRUCTURE
+================================================================================
+
+  MOBILE:
+    Bottom nav bar with 4 tabs:
+      Home | Wishlist | Cart | Account
+
+    Seller mode has a separate bottom nav:
+      Dashboard | Products | Orders | Messages | Settings
+
+  DESKTOP:
+    Top header with search bar
+    Sidebar navigation for account and seller pages
+
+  CHECKOUT:
+    Minimal header (back button + title only)
+
+
+================================================================================
+                          UNIQUE / SPECIAL FEATURES
+================================================================================
+
+  1. Oriental Mindoro hyper-local focus
+     Seller registration is geographically locked to Oriental Mindoro
+     municipalities via the PSGC API.
+
+  2. Local product categories
+     Fresh Produce, Local Delicacies, Handicrafts, Native Fashion,
+     Wellness & Herbs — tailored for Mindoro goods.
+
+  3. Auction support
+     Products can be listed as timed auctions with bid tracking
+     and countdown timers.
+
+  4. AI chatbot (Moormy Bot)
+     Context-aware assistant that knows local Mindoro stores and products.
+
+  5. PSGC address integration
+     Structured Philippine address selection down to barangay level.
+
+  6. Image upload system
+     Supabase Storage-backed uploads for avatars, product images,
+     store logos, banners, and gallery photos — with drag-and-drop,
+     zoom preview, and buyer view preview.
+
+  7. Dual backend architecture
+     Firebase for authentication + Supabase for database and storage,
+     combining the strengths of both platforms.
+
+
+================================================================================

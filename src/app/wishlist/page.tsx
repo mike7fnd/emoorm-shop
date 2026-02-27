@@ -71,7 +71,7 @@ export default function WishlistPage() {
           <h1 className="text-lg font-semibold">My Wishlist</h1>
           {wishlistedProducts.length > 0 && (
             <div className="flex items-center gap-2">
-              <Button variant="default" size="icon" onClick={handleShare} className="rounded-full">
+              <Button variant="ghost" size="icon" onClick={handleShare} className="rounded-full bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
                 <Share2 className="h-4 w-4" />
                 <span className="sr-only">Share</span>
               </Button>

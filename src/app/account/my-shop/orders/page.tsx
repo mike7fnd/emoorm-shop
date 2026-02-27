@@ -164,7 +164,7 @@ export default function SellerOrdersPage() {
                         </Button>
                       )}
                       {order.status === 'to-receive' && (
-                        <Button size="sm" variant="outline" className="rounded-full" onClick={() => handleUpdateStatus(order.id, 'to-review')}>
+                        <Button size="sm" variant="ghost" className="rounded-full bg-muted text-muted-foreground shadow-none hover:bg-muted/80" onClick={() => handleUpdateStatus(order.id, 'to-review')}>
                           <CheckCircle className="h-4 w-4 mr-1" /> Mark Delivered
                         </Button>
                       )}

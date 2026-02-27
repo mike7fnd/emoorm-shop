@@ -8,19 +8,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Settings, MapPin, Plus, X, Camera, Tag, Loader2 as Loader2Icon } from 'lucide-react';
+import { Settings, MapPin, Plus, X, Camera, Tag, Loader2 as Loader2Icon, ZoomOut, ZoomIn, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/supabase/provider';
 import { sellerService } from '@/supabase/services/seller';
 import { storeService, StorePhoto } from '@/supabase/services/stores';
 import { getSupabaseClient } from '@/supabase/client';
 import { Separator } from '@/components/ui/separator';
+import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { phAddressApi, type PsgcRegion, type PsgcProvince, type PsgcCityMunicipality } from '@/lib/ph-address-api';
+import { storageService } from '@/supabase/services/storage';
+import { ImageUpload } from '@/components/ui/image-upload';
 
 const LocationPickerMap = dynamic(() => import('@/components/map/location-picker-map'), {
   ssr: false,
@@ -59,7 +62,12 @@ export default function SettingsPage() {
   const [storePhotos, setStorePhotos] = useState<StorePhoto[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<{ icon: string; text: string }[]>([]);
   const [photoUrl, setPhotoUrl] = useState('');
+  const [photoCaption, setPhotoCaption] = useState('');
+  const [photoZoom, setPhotoZoom] = useState(100);
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [formData, setFormData] = useState({
     shopName: '',
@@ -222,10 +230,12 @@ export default function SettingsPage() {
 
   const addPhoto = async () => {
     if (!photoUrl || !sellerProfile) return;
-    const photo = await storeService.addStorePhoto(sellerProfile.id, photoUrl);
+    const photo = await storeService.addStorePhoto(sellerProfile.id, photoUrl, photoCaption || undefined);
     if (photo) {
       setStorePhotos(prev => [...prev, photo]);
       setPhotoUrl('');
+      setPhotoCaption('');
+      setPhotoZoom(100);
       setIsPhotoDialogOpen(false);
       toast({ title: 'Photo added' });
     } else {
@@ -302,36 +312,55 @@ export default function SettingsPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="shopLogo">Shop Logo URL</Label>
-                  <Input id="shopLogo" name="shopLogo" value={formData.shopLogo} onChange={handleChange} className="rounded-xl" placeholder="https://..." />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="shopBanner">Shop Banner URL</Label>
-                  <Input id="shopBanner" name="shopBanner" value={formData.shopBanner} onChange={handleChange} className="rounded-xl" placeholder="https://..." />
-                </div>
+                <ImageUpload
+                  label="Shop Logo"
+                  value={formData.shopLogo}
+                  isUploading={isUploadingLogo}
+                  shape="circle"
+                  maxSizeMB={3}
+                  onFileSelected={async (file) => {
+                    if (!sellerProfile) return;
+                    setIsUploadingLogo(true);
+                    try {
+                      const url = await storageService.uploadStoreImage(sellerProfile.id, file);
+                      if (url) {
+                        setFormData(prev => ({ ...prev, shopLogo: url }));
+                      } else {
+                        toast({ variant: 'destructive', title: 'Upload failed' });
+                      }
+                    } catch (err) {
+                      console.error('Logo upload error:', err);
+                    } finally {
+                      setIsUploadingLogo(false);
+                    }
+                  }}
+                  onClear={() => setFormData(prev => ({ ...prev, shopLogo: '' }))}
+                />
+                <ImageUpload
+                  label="Shop Banner"
+                  value={formData.shopBanner}
+                  isUploading={isUploadingBanner}
+                  shape="banner"
+                  maxSizeMB={5}
+                  onFileSelected={async (file) => {
+                    if (!sellerProfile) return;
+                    setIsUploadingBanner(true);
+                    try {
+                      const url = await storageService.uploadStoreImage(sellerProfile.id, file);
+                      if (url) {
+                        setFormData(prev => ({ ...prev, shopBanner: url }));
+                      } else {
+                        toast({ variant: 'destructive', title: 'Upload failed' });
+                      }
+                    } catch (err) {
+                      console.error('Banner upload error:', err);
+                    } finally {
+                      setIsUploadingBanner(false);
+                    }
+                  }}
+                  onClear={() => setFormData(prev => ({ ...prev, shopBanner: '' }))}
+                />
               </div>
-
-              {(formData.shopLogo || formData.shopBanner) && (
-                <div className="flex gap-4">
-                  {formData.shopLogo && (
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Logo Preview</p>
-                      <div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted">
-                        <Image src={formData.shopLogo} alt="Logo" fill className="object-cover" sizes="64px" />
-                      </div>
-                    </div>
-                  )}
-                  {formData.shopBanner && (
-                    <div className="space-y-1 flex-grow">
-                      <p className="text-xs text-muted-foreground">Banner Preview</p>
-                      <div className="relative w-full h-24 rounded-xl overflow-hidden bg-muted">
-                        <Image src={formData.shopBanner} alt="Banner" fill className="object-cover" sizes="400px" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -450,7 +479,7 @@ export default function SettingsPage() {
                 <Button type="submit" disabled={isSaving} className="rounded-full">
                   {isSaving ? 'Saving...' : 'Save Changes'}
                 </Button>
-                <Button type="button" variant="outline" onClick={() => router.back()} className="rounded-full">
+                <Button type="button" variant="ghost" onClick={() => router.back()} className="rounded-full bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
                   Cancel
                 </Button>
               </div>
@@ -498,29 +527,105 @@ export default function SettingsPage() {
         </Card>
 
         {/* Add Photo Dialog */}
-        <Dialog open={isPhotoDialogOpen} onOpenChange={setIsPhotoDialogOpen}>
-          <DialogContent className="rounded-[30px]">
+        <Dialog open={isPhotoDialogOpen} onOpenChange={(open) => {
+          setIsPhotoDialogOpen(open);
+          if (!open) { setPhotoUrl(''); setPhotoCaption(''); setPhotoZoom(100); }
+        }}>
+          <DialogContent className="rounded-[30px] max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add Store Photo</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label>Photo URL</Label>
-                <Input
-                  value={photoUrl}
-                  onChange={(e) => setPhotoUrl(e.target.value)}
-                  placeholder="https://example.com/photo.jpg"
-                  className="rounded-xl"
-                />
-              </div>
+            <div className="space-y-5 mt-4">
+              {/* Upload area */}
+              <ImageUpload
+                value={photoUrl}
+                isUploading={isUploadingPhoto}
+                shape="square"
+                maxSizeMB={5}
+                onFileSelected={async (file) => {
+                  if (!sellerProfile) return;
+                  setIsUploadingPhoto(true);
+                  try {
+                    const url = await storageService.uploadStoreImage(sellerProfile.id, file);
+                    if (url) {
+                      setPhotoUrl(url);
+                    } else {
+                      toast({ variant: 'destructive', title: 'Upload failed' });
+                    }
+                  } catch (err) {
+                    console.error('Store photo upload error:', err);
+                  } finally {
+                    setIsUploadingPhoto(false);
+                  }
+                }}
+                onClear={() => { setPhotoUrl(''); setPhotoZoom(100); }}
+              />
+
+              {/* Zoom control — visible after upload */}
               {photoUrl && (
-                <div className="relative w-full h-48 rounded-xl overflow-hidden bg-muted">
-                  <Image src={photoUrl} alt="Preview" fill className="object-cover" sizes="400px" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Adjust Zoom</Label>
+                    <span className="text-xs text-muted-foreground">{photoZoom}%</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <ZoomOut className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <Slider
+                      value={[photoZoom]}
+                      onValueChange={([v]) => setPhotoZoom(v)}
+                      min={50}
+                      max={150}
+                      step={5}
+                      className="flex-1"
+                    />
+                    <ZoomIn className="h-4 w-4 text-muted-foreground shrink-0" />
+                  </div>
                 </div>
               )}
+
+              {/* Caption / description */}
+              <div className="space-y-2">
+                <Label htmlFor="photoCaption" className="text-sm font-medium">Caption (optional)</Label>
+                <Input
+                  id="photoCaption"
+                  value={photoCaption}
+                  onChange={(e) => setPhotoCaption(e.target.value)}
+                  placeholder="e.g. Our fresh harvest display"
+                  className="rounded-xl"
+                  maxLength={120}
+                />
+                <p className="text-[11px] text-muted-foreground">{photoCaption.length}/120 — shown to buyers below the photo</p>
+              </div>
+
+              {/* Buyer preview */}
+              {photoUrl && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <Eye className="h-4 w-4" />
+                    Buyer Preview
+                  </div>
+                  <div className="border rounded-2xl overflow-hidden bg-muted">
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <img
+                        src={photoUrl}
+                        alt="Buyer preview"
+                        className="w-full h-full object-cover transition-transform duration-200"
+                        style={{ transform: `scale(${photoZoom / 100})` }}
+                      />
+                    </div>
+                    {photoCaption && (
+                      <div className="px-3 py-2 bg-white">
+                        <p className="text-sm text-foreground line-clamp-2">{photoCaption}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
               <div className="flex gap-2">
-                <Button onClick={addPhoto} className="rounded-full flex-grow" disabled={!photoUrl}>Add Photo</Button>
-                <Button variant="outline" onClick={() => setIsPhotoDialogOpen(false)} className="rounded-full">Cancel</Button>
+                <Button onClick={addPhoto} className="rounded-full flex-grow" disabled={!photoUrl || isUploadingPhoto}>Add Photo</Button>
+                <Button variant="ghost" onClick={() => { setIsPhotoDialogOpen(false); setPhotoUrl(''); setPhotoCaption(''); setPhotoZoom(100); }} className="rounded-full bg-muted text-muted-foreground shadow-none hover:bg-muted/80">Cancel</Button>
               </div>
             </div>
           </DialogContent>

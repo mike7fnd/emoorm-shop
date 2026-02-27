@@ -8,6 +8,7 @@ import { PullToRefresh } from '@/components/layout/pull-to-refresh';
 import { MainLayoutWrapper } from '@/components/layout/main-layout-wrapper';
 import { SupabaseClientProvider } from '@/supabase/client-provider';
 import { SupabaseErrorListener } from '@/components/SupabaseErrorListener';
+import { AuthSheetProvider } from '@/components/auth/auth-bottom-sheet';
 import { ServiceWorkerRegistration } from '@/components/service-worker-registration';
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt';
 import { OnboardingSplash } from '@/components/onboarding/onboarding-splash';
@@ -69,17 +70,19 @@ export default function RootLayout({
         <PWAInstallPrompt />
         <SupabaseClientProvider>
           <SupabaseErrorListener />
-          <PullToRefresh>
-            <div className="flex flex-col min-h-screen">
-              <WishlistProvider>
-                <CartProvider>
-                  <SidebarProvider>
-                    <MainLayoutWrapper>{children}</MainLayoutWrapper>
-                  </SidebarProvider>
-                </CartProvider>
-              </WishlistProvider>
-            </div>
-          </PullToRefresh>
+          <AuthSheetProvider>
+            <PullToRefresh>
+              <div className="flex flex-col min-h-screen">
+                <WishlistProvider>
+                  <CartProvider>
+                    <SidebarProvider>
+                      <MainLayoutWrapper>{children}</MainLayoutWrapper>
+                    </SidebarProvider>
+                  </CartProvider>
+                </WishlistProvider>
+              </div>
+            </PullToRefresh>
+          </AuthSheetProvider>
           <Toaster />
         </SupabaseClientProvider>
       </body>

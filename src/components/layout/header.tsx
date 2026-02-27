@@ -197,7 +197,7 @@ export function Header(props: Partial<FilterProps>) {
 
   return (
     <header className={cn(
-      "sticky top-0 z-40 transition-colors duration-200",
+      "sticky top-0 z-40 transition-colors duration-200 safe-area-top md:!pt-0",
       isScrolled ? "bg-transparent md:bg-white" : "bg-white"
     )}>
       <div className="h-16 md:h-20 flex items-center justify-between gap-4 px-4 sm:px-6 relative">

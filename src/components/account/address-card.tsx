@@ -37,7 +37,7 @@ export function AddressCard({ address, onEdit, onDelete, onSetDefault }: Address
         </p>
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
-        <Button variant="outline" size="sm" onClick={onEdit} className="rounded-[30px]">
+        <Button variant="ghost" size="sm" onClick={onEdit} className="rounded-[30px] bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
           <Edit className="mr-2 h-4 w-4" /> Edit
         </Button>
         <DropdownMenu>

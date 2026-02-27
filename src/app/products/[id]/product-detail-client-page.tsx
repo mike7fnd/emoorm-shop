@@ -145,7 +145,7 @@ export function ProductDetailClientPage({ product, reviewSummary, similarProduct
   return (
     <>
       <header className={cn(
-        "sticky top-0 z-30 h-16 flex items-center justify-between gap-4 px-4 sm:px-6 transition-colors duration-300",
+        "sticky top-0 z-30 h-16 flex items-center justify-between gap-4 px-4 sm:px-6 transition-colors duration-300 safe-area-top md:!pt-0",
         headerBg ? "bg-background shadow-sm" : "bg-transparent"
       )}>
         <Button variant="ghost" size="icon" className="rounded-full bg-background/50 hover:bg-background" onClick={() => router.back()}>

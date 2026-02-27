@@ -354,7 +354,7 @@ export function AddressForm({ address, onSave, onCancel, isSaving }: AddressForm
         </Card>
 
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={isSaving} className="bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
             Cancel
           </Button>
           <Button type="submit" disabled={isSaving}>

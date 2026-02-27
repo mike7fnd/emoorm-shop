@@ -4,13 +4,14 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import Link from 'next/link';
 import { useUser } from '@/supabase/provider';
+import { useAuthSheet } from '@/components/auth/auth-bottom-sheet';
 
 export function AuthBanner() {
   const [isVisible, setIsVisible] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const { user, isLoading } = useUser();
+  const { openAuthSheet } = useAuthSheet();
 
   useEffect(() => {
     setIsClient(true);
@@ -50,13 +51,11 @@ export function AuthBanner() {
           <p className="font-semibold text-sm">Login for full experience</p>
           <div className="flex items-center gap-2">
             <Button
-              asChild
               size="sm"
               className="rounded-full h-8 text-xs px-4 bg-white text-primary hover:bg-white/90"
+              onClick={() => openAuthSheet('login')}
             >
-              <Link href="/account">
                 Login
-              </Link>
             </Button>
             <Button
               variant="ghost"

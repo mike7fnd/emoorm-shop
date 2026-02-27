@@ -96,28 +96,52 @@ export default function SellerDashboardPage() {
     <SellerPageLayout title="Seller Dashboard">
       <div className="pt-4 md:pt-0">
         {/* Shop header - visible on mobile, hidden on desktop (sidebar has it) */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <div className="flex items-center gap-4 md:hidden">
-            <Avatar className="h-16 w-16 border-2 border-primary">
-              <AvatarImage src={sellerProfile.shop_logo} alt={sellerProfile.shop_name} />
-              <AvatarFallback>{shopInitial}</AvatarFallback>
-            </Avatar>
-            <div>
-              <h1 className="text-2xl font-bold">{sellerProfile.shop_name}</h1>
-              <p className="text-sm text-muted-foreground">
-                {sellerProfile.is_verified ? '✓ Verified Seller' : 'Pending Verification'}
-              </p>
+        {/* Shop header card - mobile */}
+        <Card className="rounded-[28px] mb-8 md:hidden overflow-hidden">
+          <CardContent className="p-5 space-y-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-14 w-14 border-2 border-primary">
+                <AvatarImage src={sellerProfile.shop_logo} alt={sellerProfile.shop_name} />
+                <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">{shopInitial}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl font-bold truncate">{sellerProfile.shop_name}</h1>
+                <p className="text-xs text-muted-foreground">
+                  {sellerProfile.is_verified ? '✓ Verified Seller' : 'Pending Verification'}
+                </p>
+              </div>
             </div>
-          </div>
-          <h1 className="hidden md:block text-2xl font-bold">Dashboard</h1>
-          <div className="flex gap-2 flex-col sm:flex-row">
-            <Button variant="outline" size="sm" asChild className="rounded-full">
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" asChild className="rounded-full flex-1 bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
+                <Link href={`/stores/${sellerProfile.id}`}>
+                  <ExternalLink className="mr-1.5 h-3.5 w-3.5" /> View Store
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild className="rounded-full flex-1 bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
+                <Link href="/account/my-shop/settings">
+                  <Settings className="mr-1.5 h-3.5 w-3.5" /> Settings
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild className="rounded-full flex-1 bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
+                <Link href="/account/my-shop/products">
+                  <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Product
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Desktop header */}
+        <div className="hidden md:flex justify-between items-center gap-4 mb-8">
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="sm" asChild className="rounded-full bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
               <Link href={`/stores/${sellerProfile.id}`}>
                 <ExternalLink className="mr-2 h-4 w-4" /> View Store
               </Link>
             </Button>
-            <Button variant="outline" size="sm" asChild className="rounded-full">
-              <Link href={`/account/my-shop/settings`}>
+            <Button variant="ghost" size="sm" asChild className="rounded-full bg-muted text-muted-foreground shadow-none hover:bg-muted/80">
+              <Link href="/account/my-shop/settings">
                 <Settings className="mr-2 h-4 w-4" /> Settings
               </Link>
             </Button>
