@@ -27,6 +27,7 @@ import { MoormyBot } from '@/components/chat/moormy-bot';
 import { productService } from '@/supabase/services/products';
 import { storeService } from '@/supabase/services/stores';
 import { dbProductToProduct, storeViewToStore } from '@/lib/db-adapters';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const MAX_PRICE = 15000;
 
@@ -329,5 +330,27 @@ export function HomeContent() {
       </main>
       <MoormyBot />
     </>
+  );
+}
+
+// Skeleton grid for products
+function ProductSkeletonGrid() {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mt-6">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <Skeleton key={i} className="h-64 w-full" />
+      ))}
+    </div>
+  );
+}
+
+// Skeleton grid for stores
+function StoreSkeletonGrid() {
+  return (
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mt-6">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <Skeleton key={i} className="h-48 w-full" />
+      ))}
+    </div>
   );
 }
